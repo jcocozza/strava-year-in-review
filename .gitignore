@@ -1,0 +1,5 @@
+# virtual environment
+stvenv
+scripts/app_config.py
+scripts/__pycache__
+__pycache__
