@@ -24,7 +24,7 @@ def create_payload(client_id, client_secret, refresh_token):
 
 # Gets access token for connecting to Strava API
 def get_access_token(payload):
-    print("Requesting Token...\n")
+    #print("Requesting Token...\n")
     try:
         res = requests.post(auth_url, data=payload, verify=False)
     except Exception as ex:
@@ -32,7 +32,7 @@ def get_access_token(payload):
         exit(1)
     else:
         access_token = res.json()['access_token']
-        print("Access Token = {}\n".format(access_token))
+        #print("Access Token = {}\n".format(access_token))
         return access_token
 
 payload = create_payload(client_id, client_secret, refresh_token)

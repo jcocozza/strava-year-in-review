@@ -36,7 +36,7 @@ def get_activities():
         return activities
 
 def upload_file(file):
-    sql_functions.upload_data_file(data_file=file, table_name='yearly_activity_data')
+    sql_functions.upload_data_file_to_remote(data_file=file, table_name='yearly_activity_data')
 
 if __name__ == '__main__':
     act = get_activities()

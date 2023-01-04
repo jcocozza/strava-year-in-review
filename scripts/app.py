@@ -6,7 +6,6 @@ import sys
 from io import StringIO
 cwd = os.getcwd()
 
-
 class Capturing(list):
     def __enter__(self):
         self._stdout = sys.stdout
@@ -36,7 +35,7 @@ def summarize():
     FROM yearly_activity_data ad
     WHERE ad.`type` = "Run" AND YEAR(start_date) = 2022;"""
 
-    data = sql_functions.sql_to_df(query)
+    data = sql_functions.remote_sql_to_df(query)
     return render_template('summary.html', data_table=Markup(data.to_html()))
 
 @app.route('/activity_list')
@@ -45,9 +44,8 @@ def activity_list():
     FROM yearly_activity_data ad 
     WHERE ad.`type` = "Run" AND YEAR(start_date) = 2022;"""
 
-    data = sql_functions.sql_to_df(query)
+    data = sql_functions.remote_sql_to_df(query)
     return render_template('activity_list.html', data_table=Markup(data.to_html()))
-
 
 if __name__ == '__main__':
     app.run(debug = True)
