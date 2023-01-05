@@ -22,13 +22,13 @@ def parse_request():
     token = get_user_activity_data.get_user_access_token(authorization_code) # getting the access token
     results = get_user_activity_data.get_user_activity_data(token) # returns a dataframe of the data (data is also saved to a csv)
 
-    path = cwd + '/data/data.csv'
+    path = cwd + '/strava-year-in-review/data/data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
     return redirect('/')
 
 @app.route('/summary_data')
 def summarize():
-    query = """SELECT SUM((ad.distance/1609.344)) AS DIST, SUM((ad.moving_time/60)) AS mov_time, SUM((ad.moving_time/60))/SUM((ad.distance/1609.344)) AS average_speed, SUM(ad.total_elevation_gain) AS total_elevation_gain 
+    query = """SELECT SUM((ad.distance/1609.344)) AS DIST, SUM((ad.moving_time/60)) AS mov_time, SUM((ad.moving_time/60))/SUM((ad.distance/1609.344)) AS average_speed, SUM(ad.total_elevation_gain) AS total_elevation_gain
     FROM strava_app_activity_data ad
     WHERE ad.`type` = "Run" AND YEAR(start_date) = 2022;"""
 
@@ -38,7 +38,7 @@ def summarize():
 @app.route('/activity_list')
 def activity_list():
     query = """SELECT ad.name, ad.id, (ad.distance/1609.344) AS distance, (ad.moving_time/60) AS moving_time, (1609.344/(ad.average_speed*60)) AS average_speed, ad.start_date_local
-    FROM strava_app_activity_data ad 
+    FROM strava_app_activity_data ad
     WHERE ad.`type` = "Run" AND YEAR(start_date) = 2022;"""
 
     data = sql_functions.local_sql_to_df(query)

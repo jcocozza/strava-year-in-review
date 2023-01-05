@@ -29,7 +29,7 @@ def engine_connection(engine_string):
     else:
         print('engine created successfully')
         return engine
-
+'''
 # connect to a remote database via ssh
 # note, user requires permissions to connect and use the database
 # returns a SQLALCHEMY engine connection
@@ -51,10 +51,10 @@ def remote_engine_connection(engine_string, ip_to_connect, user, password, port=
         print('engine created successfully')
         server.stop()
         return engine
-
+'''
 # set metadata for upload to a table in the database
 # see https://www.codepowered.com/manuals/SQLAlchemy-0.6.9-doc/html/dialects/mysql.html for more help
-# metadata that can be used with sqlalchemy and mysql: 
+# metadata that can be used with sqlalchemy and mysql:
 from sqlalchemy.dialects.mysql import \
         BIGINT, BINARY, BIT, BLOB, BOOLEAN, CHAR, DATE, \
         DATETIME, DECIMAL, DECIMAL, DOUBLE, ENUM, FLOAT, INTEGER, \
@@ -65,11 +65,11 @@ from sqlalchemy.dialects.mysql import \
 table_metadata = {
     '<column_name>':DATETIME(),
     '<column_name>':DECIMAL(),
-    '<column_name>':LONGTEXT(), 
-}  
+    '<column_name>':LONGTEXT(),
+}
 
-# leverages pandas' to_sql function, see: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_sql.html 
-# uploads a pandas dataframe to a table 
+# leverages pandas' to_sql function, see: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_sql.html
+# uploads a pandas dataframe to a table
 # By default, will replace the table. Change the if_exists if this is not desired
 # can optionally include metadata, or let pandas do it for you
 # returns nothing
@@ -88,9 +88,9 @@ def df_to_local_sql(df, table_name, metadata=None):
         exit(1)
     else:
         print('Data upload successful')
-
-# leverages pandas' to_sql function, see: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_sql.html 
-# uploads a pandas dataframe to a table 
+'''
+# leverages pandas' to_sql function, see: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_sql.html
+# uploads a pandas dataframe to a table
 # By default, will replace the table. Change the if_exists if this is not desired
 # can optionally include metadata, or let pandas do it for you
 # returns nothing
@@ -98,9 +98,9 @@ def df_to_remote_sql(df, table_name, metadata=None):
     string = generate_engine_string(app_config.db_user, app_config.db_password, app_config.db_host, app_config.db_name)
     connection = remote_engine_connection(
         engine_string=string,
-        ip_to_connect=app_config.db_host, 
-        user=app_config.remote_user, 
-        password=app_config.remote_password, 
+        ip_to_connect=app_config.db_host,
+        user=app_config.remote_user,
+        password=app_config.remote_password,
         port=22)
 
     if 'start_date' in df:
@@ -114,17 +114,17 @@ def df_to_remote_sql(df, table_name, metadata=None):
         exit(1)
     else:
         print('Data upload successful')
-
+'''
 # uploads a file to a table in a database(per the connection)
-# essentiall a wrapper for df_to_remote_sql
+# essentiall a wrapper for df_to_local_sql
 # provide metadata for the file/table
 # returns nothing
 def upload_data_file_to_local(data_file, table_name, file_metadata=None):
     # file that contains data
     df = pd.read_csv(data_file)
     # upload file
-    df_to_local_sql(df, table_name, metadata=file_metadata) 
-
+    df_to_local_sql(df, table_name, metadata=file_metadata)
+'''
 # uploads a file to a table in a database(per the connection)
 # essentiall a wrapper for df_to_remote_sql
 # provide metadata for the file/table
@@ -133,8 +133,8 @@ def upload_data_file_to_remote(data_file, table_name, file_metadata=None):
     # file that contains data
     df = pd.read_csv(data_file)
     # upload file
-    df_to_remote_sql(df, table_name, metadata=file_metadata) 
-
+    df_to_remote_sql(df, table_name, metadata=file_metadata)
+'''
 # place SQL Queries relevant to your data in here, then they can be easily accessed
 # used in sql_to_df to query data
 query_library = {
@@ -145,7 +145,7 @@ date_parse = {
     '<column_name>': '%Y-%m-%d %H:%M:%SZ',
 }
 
-# leverages pandas' read_sql function, see: https://pandas.pydata.org/docs/reference/api/pandas.read_sql.html?highlight=read_sql#pandas.read_sql 
+# leverages pandas' read_sql function, see: https://pandas.pydata.org/docs/reference/api/pandas.read_sql.html?highlight=read_sql#pandas.read_sql
 # returns a dataframe of queried SQL data
 # see query_library and date_parse
 # returns a dataframe
@@ -162,8 +162,8 @@ def local_sql_to_df(query):
     else:
         print('Data Successfully Queried...')
         return df
-
-# leverages pandas' read_sql function, see: https://pandas.pydata.org/docs/reference/api/pandas.read_sql.html?highlight=read_sql#pandas.read_sql 
+'''
+# leverages pandas' read_sql function, see: https://pandas.pydata.org/docs/reference/api/pandas.read_sql.html?highlight=read_sql#pandas.read_sql
 # returns a dataframe of queried SQL data
 # see query_library and date_parse
 # returns a dataframe
@@ -171,9 +171,9 @@ def remote_sql_to_df(query):
     string = generate_engine_string(app_config.db_user, app_config.db_password, app_config.db_host, app_config.db_name)
     connection = remote_engine_connection(
         engine_string=string,
-        ip_to_connect=app_config.db_host, 
-        user=app_config.remote_user, 
-        password=app_config.remote_password, 
+        ip_to_connect=app_config.db_host,
+        user=app_config.remote_user,
+        password=app_config.remote_password,
         port=22)
 
     print('Querying SQL Data...')
@@ -185,3 +185,4 @@ def remote_sql_to_df(query):
     else:
         print('Data Successfully Queried...')
         return df
+'''
