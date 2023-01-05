@@ -23,7 +23,7 @@ def parse_request():
     results = get_user_activity_data.get_user_activity_data(token) # returns a dataframe of the data (data is also saved to a csv)
 
     path = cwd + '/data/data.csv'
-    sql_functions.upload_data_file_to_remote(path, 'strava_app_activity_data')
+    sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
     return redirect('/')
 
 @app.route('/summary_data')
@@ -32,7 +32,7 @@ def summarize():
     FROM strava_app_activity_data ad
     WHERE ad.`type` = "Run" AND YEAR(start_date) = 2022;"""
 
-    data = sql_functions.remote_sql_to_df(query)
+    data = sql_functions.local_sql_to_df(query)
     return render_template('summary.html', data_table=Markup(data.to_html()))
 
 @app.route('/activity_list')
@@ -41,7 +41,7 @@ def activity_list():
     FROM strava_app_activity_data ad 
     WHERE ad.`type` = "Run" AND YEAR(start_date) = 2022;"""
 
-    data = sql_functions.remote_sql_to_df(query)
+    data = sql_functions.local_sql_to_df(query)
     return render_template('activity_list.html', data_table=Markup(data.to_html()))
 
 if __name__ == '__main__':
