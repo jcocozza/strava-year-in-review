@@ -17,7 +17,7 @@ import requests
 
 cwd = os.getcwd()
 
-approval_link = 'https://www.strava.com/oauth/authorize?client_id=89519&response_type=code&redirect_uri=http://localhost:8888/exchange_token&approval_prompt=force&scope=activity:read'
+approval_link = 'https://www.strava.com/oauth/authorize?client_id=89519&response_type=code&redirect_uri=http://jcocozza.pythonanywhere.com/exchange_token&approval_prompt=force&scope=activity:read'
 auth_url = "https://www.strava.com/oauth/token"
 activites_url = "https://www.strava.com/api/v3/athlete/activities"
 
