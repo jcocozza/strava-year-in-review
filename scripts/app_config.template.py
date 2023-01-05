@@ -7,7 +7,7 @@ db_host = ''
 db_name = ''
 
 # For remote ssh connection:
-remote_user='', 
+remote_user='' 
 remote_password=''
 
 #Strava API connection 
