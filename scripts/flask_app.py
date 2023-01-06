@@ -7,12 +7,12 @@ import os
 cwd = os.getcwd()
 
 app = Flask(__name__)
+app.secret_key = 'blahblahblahblahblah'
 
 @app.route('/login', methods=['GET','POST'])
 def login():
     # Output message if something goes wrong...
     msg = ''
-    result = None
     # Check if "username" and "password" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         # Create variables for easy access
@@ -20,22 +20,23 @@ def login():
         password = str(request.form['password'])
 
         # Check if account exists
-        query = """SELECT us.username, us.password FROM users us WHERE us.username = %s AND us.password = %s ;""" % (username, password)
+        query = """SELECT * FROM users WHERE username = '%s' AND password = '%s';""" % (username, password)
         result = sql_functions.local_sql_to_df(query)
 
-    # If account exists in accounts table in out database
-    if result:
-        # Create session data, we can access this data in other routes
-        session['loggedin'] = True
-        session['id'] = result['user_id']
-        session['username'] = result['username']
-        # Redirect to home page
-        return 'Logged in successfully!' #redirect('/', code=302)
+
+        # If account exists in accounts table in out database
+        if not result.empty:
+            # Create session data, we can access this data in other routes
+            session['loggedin'] = True
+            session['id'] = int(result['user_id'][0])
+            session['username'] = str(result['username'][0])
+            # Redirect to home page
+            return redirect('/', code=302)
     else:
         # Account doesnt exist or username/password incorrect
         msg = 'Incorrect username/password!'
 
-    return render_template('login.html', msg='')
+    return render_template('login.html', msg=msg)
 
 @app.route('/')
 def welcome_page():
