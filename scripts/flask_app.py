@@ -8,6 +8,7 @@ import os
 cwd = os.getcwd()
 
 app = Flask(__name__)
+
 app.secret_key = 'blahblahblahblahblah'
 
 @app.route('/')
@@ -102,7 +103,7 @@ def parse_request():
     authorization_code = request.args['code'] # grabbing the authorization code that is returned by strava in the URL
     token = get_user_activity_data.get_user_access_token(authorization_code) # getting the access token
     results = get_user_activity_data.get_user_activity_data(token) # returns a dataframe of the data (data is also saved to a csv)
-
+    
     path = cwd + '/data/data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
     return redirect('/home')

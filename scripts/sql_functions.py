@@ -59,7 +59,7 @@ def remote_engine_connection(engine_string, ip_to_connect, user, password, port=
         print('engine created successfully')
         server.stop()
         return engine
-
+'''
 # set metadata for upload to a table in the database
 # see https://www.codepowered.com/manuals/SQLAlchemy-0.6.9-doc/html/dialects/mysql.html for more help
 # metadata that can be used with sqlalchemy and mysql:
@@ -122,9 +122,9 @@ def df_to_remote_sql(df, table_name, metadata=None):
         exit(1)
     else:
         print('Data upload successful')
-
+'''
 # uploads a file to a table in a database(per the connection)
-# essentiall a wrapper for df_to_remote_sql
+# essentiall a wrapper for df_to_local_sql
 # provide metadata for the file/table
 # returns nothing
 def upload_data_file_to_local(data_file, table_name, file_metadata=None):
@@ -193,3 +193,4 @@ def remote_sql_to_df(query):
     else:
         print('Data Successfully Queried...')
         return df
+'''

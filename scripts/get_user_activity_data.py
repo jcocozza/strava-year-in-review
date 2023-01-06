@@ -1,18 +1,18 @@
 import app_config
 from strava_api_throttle import call_api
 import pandas as pd
-import os 
+import os
 import requests
 
 # A quick overview of how this works:
 # The developer needs to create an application through strava
 # From this they get a client_id and client_secret
-# The application will send a user to a link similar to this: 
+# The application will send a user to a link similar to this:
 # https://www.strava.com/oauth/authorize?client_id=89519&response_type=code&redirect_uri=http://localhost:8888/exchange_token&approval_prompt=force&scope=activity:read
 # that link will proper the user to grant permissions so the developer can access data
 # The link will then foward the user to the redirect_uri. This foward will contain an authorization code in the URL
 # From that authorization code the developer can generate an access token by making a POST request to https://www.strava.com/oauth/token
-# The post request will return an access token. 
+# The post request will return an access token.
 # The access token can then be used with a GET request to https://www.strava.com/api/v3/athlete/activities for data
 
 cwd = os.getcwd()
@@ -90,5 +90,5 @@ def get_user_activity_data(access_token):
         exit(1)
     else:
         # save data to a csv
-        activities.to_csv(cwd + '/data/data.csv')
+        activities.to_csv(cwd + '/strava-year-in-review/data/data.csv')
         return activities
