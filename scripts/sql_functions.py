@@ -30,6 +30,14 @@ def engine_connection(engine_string):
         print('engine created successfully')
         return engine
 
+# Using SQLAlchemy built in features rather than converting to a dataframe 
+def query_database(query):
+    string = generate_engine_string(app_config.db_user, app_config.db_password, app_config.db_host, app_config.db_name)
+    connection = engine_connection(string)
+
+    result = connection.execute(query)
+    return result
+
 # connect to a remote database via ssh
 # note, user requires permissions to connect and use the database
 # returns a SQLALCHEMY engine connection

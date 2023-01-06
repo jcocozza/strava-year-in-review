@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Markup, redirect, request, url_for
+from flask import Flask, render_template, Markup, redirect, request, url_for,session
 import sql_functions
 import get_user_activity_data
 from get_user_activity_data import approval_link
@@ -7,6 +7,33 @@ import os
 cwd = os.getcwd()
 
 app = Flask(__name__)
+
+@app.route('/login')
+def login():
+    # Output message if something goes wrong...
+    msg = ''
+    # Check if "username" and "password" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+        # Create variables for easy access
+        username = request.form['username']
+        password = request.form['password']
+
+    # Check if account exists
+    result = sql_functions.query_database('SELECT * FROM users WHERE username = %s AND password = %s', (username, password))
+
+    # If account exists in accounts table in out database
+    if result:
+        # Create session data, we can access this data in other routes
+        session['loggedin'] = True
+        session['id'] = result['user_id']
+        session['username'] = result['username']
+        # Redirect to home page
+        return redirect('welcome_page', code=302)
+    else:
+        # Account doesnt exist or username/password incorrect
+        msg = 'Incorrect username/password!'
+
+    return render_template('login.html', msg='')
 
 @app.route('/')
 def welcome_page():
