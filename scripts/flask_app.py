@@ -8,18 +8,20 @@ cwd = os.getcwd()
 
 app = Flask(__name__)
 
-@app.route('/login')
+@app.route('/login', methods=['GET','POST'])
 def login():
     # Output message if something goes wrong...
     msg = ''
+    result = None
     # Check if "username" and "password" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         # Create variables for easy access
-        username = request.form['username']
-        password = request.form['password']
+        username = str(request.form['username'])
+        password = str(request.form['password'])
 
-    # Check if account exists
-    result = sql_functions.query_database('SELECT * FROM users WHERE username = %s AND password = %s', (username, password))
+        # Check if account exists
+        query = """SELECT us.username, us.password FROM users us WHERE us.username = %s AND us.password = %s ;""" % (username, password)
+        result = sql_functions.local_sql_to_df(query)
 
     # If account exists in accounts table in out database
     if result:
@@ -28,7 +30,7 @@ def login():
         session['id'] = result['user_id']
         session['username'] = result['username']
         # Redirect to home page
-        return redirect('welcome_page', code=302)
+        return 'Logged in successfully!' #redirect('/', code=302)
     else:
         # Account doesnt exist or username/password incorrect
         msg = 'Incorrect username/password!'
@@ -55,7 +57,7 @@ def parse_request():
 
 @app.route('/summary_data')
 def summarize():
-    query = """SELECT SUM((ad.distance/1609.344)) AS DIST, SUM((ad.moving_time/60)) AS mov_time, SUM((ad.moving_time/60))/SUM((ad.distance/1609.344)) AS average_speed, SUM(ad.total_elevation_gain) AS total_elevation_gain 
+    query = """SELECT SUM((ad.distance/1609.344)) AS DIST, SUM((ad.moving_time/60)) AS mov_time, SUM((ad.moving_time/60))/SUM((ad.distance/1609.344)) AS average_speed, SUM(ad.total_elevation_gain) AS total_elevation_gain
     FROM strava_app_activity_data ad
     WHERE ad.`type` = "Run" AND YEAR(start_date) = 2022;"""
 
@@ -65,7 +67,7 @@ def summarize():
 @app.route('/activity_list')
 def activity_list():
     query = """SELECT ad.name, ad.id, (ad.distance/1609.344) AS distance, (ad.moving_time/60) AS moving_time, (1609.344/(ad.average_speed*60)) AS average_speed, ad.start_date_local
-    FROM strava_app_activity_data ad 
+    FROM strava_app_activity_data ad
     WHERE ad.`type` = "Run" AND YEAR(start_date) = 2022;"""
 
     data = sql_functions.local_sql_to_df(query)
