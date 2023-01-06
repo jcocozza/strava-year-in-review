@@ -6,6 +6,8 @@ import pandas as pd
 import os
 
 cwd = os.getcwd()
+repo_dir = cwd + '/strava-year-in-review'
+cwd = repo_dir
 
 app = Flask(__name__)
 app.secret_key = 'blahblahblahblahblah'
