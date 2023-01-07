@@ -51,6 +51,17 @@ def insert_refresh_token(token):
         conn.execute(text(sql))
         print('token inserted successfully')
 
+# Adding athlete_id that is pulled from strava
+def insert_athlete_id(athlete_id):
+    sql = "UPDATE users SET athlete_id = '%s' WHERE user_id = %s" % (athlete_id, session['id'])
+
+    string = generate_engine_string(app_config.db_user, app_config.db_password, app_config.db_host, app_config.db_name)
+    connection = engine_connection(string)
+
+    with connection.connect() as conn:
+        conn.execute(text(sql))
+        print('athlete_id inserted successfully')
+
 # connect to a remote database via ssh
 # note, user requires permissions to connect and use the database
 # returns a SQLALCHEMY engine connection

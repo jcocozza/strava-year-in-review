@@ -80,7 +80,7 @@ def get_user_access_token_from_refresh_token(payload):
 def get_user_access_token(authorization_code):
     payload = create_payload_auth(client_id, client_secret, authorization_code)
     access_token, refresh_token, athlete_data = get_user_tokens(payload)
-    return access_token, refresh_token
+    return access_token, refresh_token, athlete_data
 
 # A wrapper function that returns access token for a RETURNING user
 def returning_user_access_token(refresh_token):

@@ -102,10 +102,11 @@ def get_approved():
 @app.route('/exchange_token', methods=['GET'])
 def parse_request():
     authorization_code = request.args['code'] # grabbing the authorization code that is returned by strava in the URL
-    access_token, refresh_token = get_user_activity_data.get_user_access_token(authorization_code) # getting the access token
+    access_token, refresh_token, athlete_data = get_user_activity_data.get_user_access_token(authorization_code) # getting the access token
     results = get_user_activity_data.get_user_activity_data(access_token) # returns a dataframe of the data (data is also saved to a csv)
 
     sql_functions.insert_refresh_token(refresh_token) # adds refresh token to user data
+    sql_functions.insert_athlete_id(athlete_data['id']) # adds athlete_id to user data
 
     path = cwd + '/data/data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
