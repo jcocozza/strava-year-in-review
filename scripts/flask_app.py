@@ -135,7 +135,7 @@ def summarize():
 
 @app.route('/activity_list')
 def activity_list():
-    query = """SELECT ad.name, ad.id, (ad.distance/1609.344) AS distance, (ad.moving_time/60) AS moving_time, (1609.344/(ad.average_speed*60)) AS average_speed, ad.start_date_local
+    query = """SELECT DISTINCT ad.name, ad.id, (ad.distance/1609.344) AS distance, (ad.moving_time/60) AS moving_time, (1609.344/(ad.average_speed*60)) AS average_speed, ad.start_date_local
     FROM strava_app_activity_data ad
     WHERE ad.`type` = "Run" AND YEAR(start_date) = 2022;"""
 
