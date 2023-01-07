@@ -68,7 +68,7 @@ def get_user_tokens(payload):
 def get_user_access_token(authorization_code):
     payload = create_payload_auth(client_id, client_secret, authorization_code)
     access_token, refresh_token, athlete_data = get_user_tokens(payload)
-    return access_token
+    return access_token, refresh_token
 
 # Gets activity data for a user given their access token
 def get_user_activity_data(access_token):
