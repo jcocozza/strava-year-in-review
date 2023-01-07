@@ -47,7 +47,7 @@ def create_payload_refresh(client_id, client_secret, refresh_token):
     return payload_info
 
 # Gets access and refresh tokens for connecting to Strava API
-# This function may need to be modified to accommodate returning users (the refresh payload may not cause the return of a refresh key)
+# This is for first time users who are granting strava access for the first time
 def get_user_tokens(payload):
     print("Requesting Token...\n")
     try:
@@ -63,12 +63,30 @@ def get_user_tokens(payload):
         print("Refresh Token = {}\n".format(refresh_token))
         return access_token, refresh_token, athlete_data
 
-# A wrapper function that returns the access token for a user
-# Currently, I am not doing anything with the refresh tokens (eventually I will have to save them in a database for returning users)
+# For users that have already granted access to strava 
+def get_user_access_token_from_refresh_token(payload):
+    print("Requesting Token...\n")
+    try:
+        res = requests.post(auth_url, data=payload, verify=False)
+    except Exception as ex:
+        print('Unable to get access token: ', ex)
+        exit(1)
+    else:
+        access_token = res.json()['access_token']
+        print("Access Token = {}\n".format(access_token))
+        return access_token
+
+# A wrapper function that returns the access token for a NEW user
 def get_user_access_token(authorization_code):
     payload = create_payload_auth(client_id, client_secret, authorization_code)
     access_token, refresh_token, athlete_data = get_user_tokens(payload)
     return access_token, refresh_token
+
+# A wrapper function that returns access token for a RETURNING user
+def returning_user_access_token(refresh_token):
+    payload = create_payload_refresh(client_id, client_secret, refresh_token)
+    access_token = get_user_access_token_from_refresh_token(payload)
+    return access_token
 
 # Gets activity data for a user given their access token
 def get_user_activity_data(access_token):
