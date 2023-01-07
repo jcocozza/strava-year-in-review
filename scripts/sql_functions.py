@@ -1,11 +1,13 @@
 from genericpath import exists
 import pandas as pd
 import sqlalchemy
+from sqlalchemy import text
 import pymysql
 import urllib
 from datetime import datetime, timedelta
 from sshtunnel import SSHTunnelForwarder
 import app_config
+from flask import session
 
 # generates an engine string for connecting to a mysql database
 # returns a string
@@ -37,6 +39,17 @@ def query_database(query):
 
     result = connection.execute(query)
     return result
+
+# Adding refresh token that is generated for a user
+def insert_refresh_token(token):
+    sql = "UPDATE users SET refresh_token = '%s' WHERE user_id = %s" % (token, session['id'])
+
+    string = generate_engine_string(app_config.db_user, app_config.db_password, app_config.db_host, app_config.db_name)
+    connection = engine_connection(string)
+
+    with connection.connect() as conn:
+        conn.execute(text(sql))
+        print('token inserted successfully')
 
 # connect to a remote database via ssh
 # note, user requires permissions to connect and use the database
