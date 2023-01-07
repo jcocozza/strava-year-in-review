@@ -113,14 +113,15 @@ def parse_request():
 
 @app.route('/refresh_data')
 def refresh_data():
-    sql = "SELECT refresh_token FROM users user_id = %s" % (session['id'],)
+    sql = "SELECT refresh_token FROM users WHERE user_id = '%s'" % (session['id'],)
     data = sql_functions.local_sql_to_df(sql) # get refresh token from db
     refresh_token = data['refresh_token'][0]
     access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
     results = get_user_activity_data.get_user_activity_data(access_token) # returns a dataframe of the data (data is also saved to a csv)
 
-    path = cwd + '/data/returing_data.csv'
+    path = cwd + '/data/data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
+    return redirect('/home')
 
 @app.route('/summary_data')
 def summarize():
