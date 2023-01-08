@@ -81,6 +81,7 @@ def register():
             df = pd.DataFrame(data, index=[0])
             sql_functions.df_to_local_sql(df, 'users')
             msg = 'Successfully Registered'
+            return redirect(url_for('login'))
 
     elif request.method == 'POST':
         # Form is empty... (no POST data)
