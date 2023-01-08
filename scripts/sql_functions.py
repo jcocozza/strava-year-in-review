@@ -8,6 +8,9 @@ from datetime import datetime, timedelta
 from sshtunnel import SSHTunnelForwarder
 import app_config
 from flask import session
+# For handling duplicates
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.sql.expression import Insert
 
 # generates an engine string for connecting to a mysql database
 # returns a string
@@ -106,6 +109,14 @@ table_metadata = {
 # can optionally include metadata, or let pandas do it for you
 # returns nothing
 def df_to_local_sql(df, table_name, metadata=None):
+
+    # adds the word IGNORE after INSERT in sqlalchemy
+    # This is a workaround to handle duplicate rows
+    # Since id is a primary key in the table schema, duplicates will not be uploaded
+    @compiles(Insert)
+    def _prefix_insert_with_ignore(insert, compiler, **kw):
+        return compiler.visit_insert(insert.prefix_with('IGNORE'), **kw)
+
     string = generate_engine_string(app_config.db_user, app_config.db_password, app_config.db_host, app_config.db_name)
     connection = engine_connection(string)
 
