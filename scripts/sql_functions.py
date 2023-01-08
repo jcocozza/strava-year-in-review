@@ -65,6 +65,12 @@ def insert_athlete_id(athlete_id):
         conn.execute(text(sql))
         print('athlete_id inserted successfully')
 
+# returns athlete_id stored in user table based on what user is logged in
+def get_athlete_id():
+    sql = "SELECT athlete_id FROM users WHERE user_id = %s" % (session['id'],)
+    id = local_sql_to_df(sql)['athlete_id'][0]
+    return id
+
 # connect to a remote database via ssh
 # note, user requires permissions to connect and use the database
 # returns a SQLALCHEMY engine connection
