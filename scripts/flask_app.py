@@ -144,6 +144,10 @@ def activity_list():
     data = sql_functions.local_sql_to_df(query)
     return render_template('activity_list.html', data_table=Markup(data.to_html()))
 
+@app.route('/manifesto')
+def manifesto():
+    return render_template('HowtoGetFast.html')
+
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
     app.run(host='0.0.0.0',debug=False, port=8888)
