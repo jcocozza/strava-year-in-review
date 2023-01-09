@@ -1,43 +1,24 @@
 <!DOCTYPE html>
-
 <html lang="en" dir="ltr">
-<head>
-    <meta charset="utf-8">
-    <title>Flask Parent Template</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
+   <head>
+      <meta charset="utf-8">
+      <title>Homepage</title>
    </head>
-    <body>
-        <header>
-            <div class="container">
-            <h1 class="logo">Running Website</h1>
-            <strong>
-                <nav>
-                    <ul class="menu">
-                        <li class="active"><a href="{{ url_for('welcome_page') }}">Home Page</a></li>
-                        <li><a href="{{ url_for('summarize') }}">See summary statistics</a></li>
-                        <li><a href="{{ url_for('activity_list') }}">See all of your activites here</a></li>
-                    </ul>
-                </nav>
-            </strong>
-            </div>
-        </header>
-        {% block content %} 
-        {% endblock %}
-    </body>
-
-<html>
-    <head>
-        <title>Strava Yearly Data Analysis</title>
-    </head>
-    <body>
-        <h1>Strava Yearly Data Analysis</h1>
+   <body>
+      {% extends "template.html" %}
+      {% block content %}
+      <h1> Strava Yearly Data Analysis </h1>
         <p><a href="{{ url_for('get_approved') }}">Grant Access to Strava Data</a></p>
         <p><a href="{{ url_for('refresh_data') }}">Refresh strava data</a></p>
         <p><a href="{{ url_for('welcome_page') }}">Home Page</a></p>
         <p><a href="{{ url_for('summarize') }}">See summary statistics</a></p>
         <p><a href="{{ url_for('activity_list') }}">See all of your activites here</a></p>
-    </body>
+      {% endblock %}
+   </body>
 </html>
+
+
+
 
 
 
