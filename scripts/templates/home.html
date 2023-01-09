@@ -1,17 +1,25 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Strava Yearly Data Analysis</title>
-    </head>
-    <body>
-        <h1>Strava Yearly Data Analysis</h1>
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Homepage</title> <!-- what the website is called in a tab-->
+   </head>
+   <body>
+      {% extends "navigation.html" %}
+      {% block content %}
+      <!-- Page content -->
+      <h1> Strava Yearly Data Analysis </h1>
         <p><a href="{{ url_for('get_approved') }}">Grant Access to Strava Data</a></p>
         <p><a href="{{ url_for('refresh_data') }}">Refresh strava data</a></p>
+        <p><a href="{{ url_for('welcome_page') }}">Home Page</a></p>
         <p><a href="{{ url_for('summarize') }}">See summary statistics</a></p>
         <p><a href="{{ url_for('activity_list') }}">See all of your activites here</a></p>
-        <p><a href="{{ url_for('welcome_page') }}">Home Page</a></p>
-    </body>
+      {% endblock %}
+   </body>
 </html>
+
+
+
 
 
 
