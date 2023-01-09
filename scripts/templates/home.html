@@ -2,11 +2,12 @@
 <html lang="en" dir="ltr">
    <head>
       <meta charset="utf-8">
-      <title>Homepage</title>
+      <title>Homepage</title> <!-- what the website is called in a tab-->
    </head>
    <body>
       {% extends "template.html" %}
       {% block content %}
+      <!-- Page content -->
       <h1> Strava Yearly Data Analysis </h1>
         <p><a href="{{ url_for('get_approved') }}">Grant Access to Strava Data</a></p>
         <p><a href="{{ url_for('refresh_data') }}">Refresh strava data</a></p>
