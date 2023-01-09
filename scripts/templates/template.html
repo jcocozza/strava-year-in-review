@@ -1,26 +1,27 @@
 <!DOCTYPE html>
-
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="utf-8">
-    <title>Running Website</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/template.css') }}">
-   </head>
+<html>
+    <head>
+        <title>Running Website</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/templates.css') }}">
+    </head>
     <body>
         <header>
             <div class="container">
-            <h1 class="logo">Running Website</h1>
-            <strong>
-                <nav>
-                    <ul class="menu">
-                        <li class="active"><a href="{{ url_for('welcome_page') }}">Home Page</a></li>
-                        <li><a href="{{ url_for('summarize') }}">See summary statistics</a></li>
-                        <li><a href="{{ url_for('activity_list') }}">See all of your activites here</a></li>
-                    </ul>
-                </nav>
-            </strong>
+                <h1 class="logo">Running Website</h1>
+                <strong>
+                    <nav>
+                        <ul class="menu">
+                            <li><a href="{{ url_for('welcome_page') }}">Home Page</a></li>
+                            <li><a href="{{ url_for('summarize') }}">See summary statistics</a></li>
+                            <li><a href="{{ url_for('activity_list') }}">See all of your activites here</a></li>
+                        </ul>
+                    </nav>
+                </strong>
             </div>
         </header>
-        {% block content %} 
-        {% endblock %}
+        <div class="container">
+            {% block content %} 
+            {% endblock %}
+        </div>
     </body>
+</html>
