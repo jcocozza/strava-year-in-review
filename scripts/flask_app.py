@@ -89,18 +89,17 @@ def register():
     # Show registration form with message (if any)
     return render_template('register.html', msg=msg)
 
-
 @app.route('/home')
 def welcome_page():
     if 'loggedin' in session: # only see home if logged in
         return render_template('home.html')
     return redirect(url_for('login'))
 
-@app.route('/get_data')
+@app.route('/strava/get_data')
 def get_approved():
     return redirect(approval_link, code=302)
 
-@app.route('/exchange_token', methods=['GET'])
+@app.route('/strava/exchange_token', methods=['GET'])
 def parse_request():
     authorization_code = request.args['code'] # grabbing the authorization code that is returned by strava in the URL
     access_token, refresh_token, athlete_data = get_user_activity_data.get_user_access_token(authorization_code) # getting the access token
@@ -113,7 +112,7 @@ def parse_request():
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
     return redirect('/home')
 
-@app.route('/refresh_data')
+@app.route('/strava/refresh_data')
 def refresh_data():
     sql = "SELECT refresh_token FROM users WHERE user_id = '%s'" % (session['id'],)
     data = sql_functions.local_sql_to_df(sql) # get refresh token from db
@@ -125,7 +124,7 @@ def refresh_data():
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
     return redirect('/home')
 
-@app.route('/summary_data')
+@app.route('/strava/summary_data')
 def summarize():
     athlete_id = sql_functions.get_athlete_id()
     query = """SELECT SUM((ad.distance/1609.344)) AS DIST, SUM((ad.moving_time/60)) AS mov_time, SUM((ad.moving_time/60))/SUM((ad.distance/1609.344)) AS average_speed, SUM(ad.total_elevation_gain) AS total_elevation_gain
@@ -135,7 +134,7 @@ def summarize():
     data = sql_functions.local_sql_to_df(query)
     return render_template('summary.html', data_table=Markup(data.to_html()))
 
-@app.route('/activity_list')
+@app.route('/strava/activity_list')
 def activity_list():
     athlete_id = sql_functions.get_athlete_id()
     query = """SELECT DISTINCT ad.name, ad.id, (ad.distance/1609.344) AS distance, (ad.moving_time/60) AS moving_time, (1609.344/(ad.average_speed*60)) AS average_speed, ad.start_date_local
@@ -181,6 +180,10 @@ def ad_hoc():
         msg = 'Please fill out the form!'
     # Show page
     return render_template('ad_hoc_results.html', msg=msg)
+
+@app.route('/strava')
+def strava():
+    return render_template('strava_page.html')
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
