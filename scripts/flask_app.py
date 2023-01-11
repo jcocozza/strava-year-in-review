@@ -110,7 +110,7 @@ def parse_request():
 
     path = cwd + '/data/data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
-    return redirect('/home')
+    return redirect('/strava')
 
 @app.route('/strava/refresh_data')
 def refresh_data():
@@ -122,7 +122,7 @@ def refresh_data():
 
     path = cwd + '/data/data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
-    return redirect('/home')
+    return redirect('/strava')
 
 @app.route('/strava/summary_data')
 def summarize():
