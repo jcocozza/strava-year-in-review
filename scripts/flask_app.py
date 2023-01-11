@@ -145,6 +145,52 @@ def activity_list():
     data = sql_functions.local_sql_to_df(query)
     return render_template('activity_list.html', data_table=Markup(data.to_html()))
 
+@app.route('/strava/ad_hoc', methods=['GET','POST'])
+def ad_hoc():
+    # Output message if something goes wrong...
+    msg = ''
+    # Check if "start_date", "end_date" POST requests exist (user submitted form)
+    # date in the form of YYYY-MM-DD
+    if request.method == 'POST' and 'start_date' in request.form and 'end_date' in request.form:
+        # Create variables for easy access
+        start_date = request.form['start_date']
+        end_date = request.form['end_date']
+
+        # Make sure user fills out info
+        if not start_date or not end_date:
+            msg = 'Please fill out the form!'
+        else:
+            athlete_id = sql_functions.get_athlete_id()
+            sql = """
+            SELECT saad.name 
+            FROM strava_app_activity_data saad 
+            WHERE saad.`athlete.id` = '%s' 
+            AND saad.start_date_local BETWEEN CAST('%s' AS DATETIME) AND CAST('%s' AS DATETIME); 
+            """ % (athlete_id, start_date, end_date)
+
+            # Query database based on start date
+            data = sql_functions.local_sql_to_df(sql)
+
+            msg = 'Data Query Successful'
+
+            # redirect to data table with rest of page
+            return render_template('ad_hoc_results.html', msg=msg, data_table=data.to_html())
+
+    elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        msg = 'Please fill out the form!'
+    # Show page
+    return render_template('ad_hoc_results.html', msg=msg, data_table=data.to_html())
+
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
     app.run(host='0.0.0.0',debug=False, port=8888)
