@@ -162,10 +162,10 @@ def ad_hoc():
         else:
             athlete_id = sql_functions.get_athlete_id()
             sql = """
-            SELECT saad.name 
-            FROM strava_app_activity_data saad 
-            WHERE saad.`athlete.id` = '%s' 
-            AND saad.start_date_local BETWEEN CAST('%s' AS DATETIME) AND CAST('%s' AS DATETIME); 
+            SELECT saad.name
+            FROM strava_app_activity_data saad
+            WHERE saad.`athlete.id` = '%s'
+            AND saad.start_date_local BETWEEN CAST('%s' AS DATETIME) AND CAST('%s' AS DATETIME);
             """ % (athlete_id, start_date, end_date)
 
             # Query database based on start date
@@ -180,7 +180,7 @@ def ad_hoc():
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
     # Show page
-    return render_template('ad_hoc_results.html', msg=msg, data_table=data.to_html())
+    return render_template('ad_hoc_results.html', msg=msg)
 
 
 
