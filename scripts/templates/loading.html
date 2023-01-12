@@ -39,16 +39,23 @@
         }
 
         @-webkit-keyframes animatebottom {
-        from { bottom:-100px; opacity:0 } 
+        from { bottom:-100px; opacity:0 }
         to { bottom:0px; opacity:1 }
         }
 
-        @keyframes animatebottom { 
-        from{ bottom:-100px; opacity:0 } 
+        @keyframes animatebottom {
+        from{ bottom:-100px; opacity:0 }
         to{ bottom:0; opacity:1 }
         }
-
         </style>
+
+        <script>
+          function navigate() {
+            window.location.href = "{{ url_for('strava') }}";  // redirect when done!
+          }
+          fetch("{{ url_for('refresh_data') }}").then(navigate); // load the slow url then navigate
+        </script>
+
     </head>
 
     <h2 style="text-align:center">Refreshing Data...</h2>

@@ -1,9 +1,11 @@
-from flask import Flask, render_template, Markup, redirect, request, url_for,session
+from flask import Flask, render_template, Markup, redirect, request, url_for,session, flash
 import sql_functions
 import get_user_activity_data
 from get_user_activity_data import approval_link
 import pandas as pd
 import os
+import threading
+from threading import Thread
 
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
@@ -112,10 +114,12 @@ def parse_request():
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
     return redirect('/strava')
 
+@app.route('/loading_page')
+def loading():
+    return render_template('loading.html')
+
 @app.route('/strava/refresh_data')
 def refresh_data():
-    
-    Flask.flash(render_template('loading.html'))
 
     sql = "SELECT refresh_token FROM users WHERE user_id = '%s'" % (session['id'],)
     data = sql_functions.local_sql_to_df(sql) # get refresh token from db
@@ -125,8 +129,8 @@ def refresh_data():
 
     path = cwd + '/data/data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
-   
-    return redirect('/strava')
+
+    return render_template('strava_page.html') #redirect('/strava')
 
 @app.route('/strava/summary_data')
 def summarize():

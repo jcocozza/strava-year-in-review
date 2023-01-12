@@ -1,24 +1,29 @@
 <!-- Basic Outline of a webpage that includes the header -->
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-   <head>
-      <meta charset="utf-8">
-      <title> Strava Stuff </title> <!-- what the website is called in a tab-->
+    <head>
+        <meta charset="utf-8">
+        <title> Strava Stuff </title> <!-- what the website is called in a tab-->
     </head>
    <body>
       {% extends "navigation.html" %}
       {% block content %}
-      <!-- Page content -->
-      
-        <h1>Strava Links</h1>
-        <p><a href="{{ url_for('get_approved') }}">Grant Access to Strava Data</a></p>
-        <p><a href="{{ url_for('refresh_data') }}">Refresh strava data</a></p>
-        <p><a href="{{ url_for('ad_hoc') }}"> Query your strava data</a></p>
+       <!-- Page content -->
 
-        <h2>Year in Review</h2>
-        <p><a href="{{ url_for('summarize') }}">See summary statistics</a></p>
-        <p><a href="{{ url_for('activity_list') }}">See all of your activites here</a></p>
+        <div id="content">
 
+            <h1>Strava Links</h1>
+            <p><a href="{{ url_for('get_approved') }}">Grant Access to Strava Data</a></p>
+
+            <p><a href="{{ url_for('loading') }}">Refresh strava data V2</a></p>
+
+            <p><a href="{{ url_for('refresh_data') }}">Refresh strava data</a></p>
+            <p><a href="{{ url_for('ad_hoc') }}"> Query your strava data</a></p>
+
+            <h2>Year in Review</h2>
+            <p><a href="{{ url_for('summarize') }}">See summary statistics</a></p>
+            <p><a href="{{ url_for('activity_list') }}">See all of your activites here</a></p>
+        </div>
       <!-- End Page content -->
       {% endblock %}
    </body>
