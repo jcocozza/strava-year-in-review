@@ -12,6 +12,8 @@ cwd = repo_dir
 app = Flask(__name__)
 app.secret_key = 'blahblahblahblahblah'
 
+process_is_running = False
+
 @app.route('/')
 def enter():
     return redirect(url_for('welcome_page'))
@@ -114,6 +116,7 @@ def parse_request():
 
 @app.route('/strava/refresh_data')
 def refresh_data():
+    process_is_running = True
     sql = "SELECT refresh_token FROM users WHERE user_id = '%s'" % (session['id'],)
     data = sql_functions.local_sql_to_df(sql) # get refresh token from db
     refresh_token = data['refresh_token'][0]
@@ -122,6 +125,7 @@ def refresh_data():
 
     path = cwd + '/data/data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
+    process_is_running = False
     return redirect('/strava')
 
 @app.route('/strava/summary_data')
@@ -183,7 +187,7 @@ def ad_hoc():
 
 @app.route('/strava')
 def strava():
-    return render_template('strava_page.html')
+    return render_template('strava_page.html', info=process_is_running)
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
