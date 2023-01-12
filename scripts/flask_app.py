@@ -115,7 +115,7 @@ def parse_request():
 @app.route('/strava/refresh_data')
 def refresh_data():
     
-    #render_template('loading.html')
+    Flask.flash(render_template('loading.html'))
 
     sql = "SELECT refresh_token FROM users WHERE user_id = '%s'" % (session['id'],)
     data = sql_functions.local_sql_to_df(sql) # get refresh token from db

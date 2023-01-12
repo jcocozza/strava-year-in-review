@@ -4,39 +4,12 @@
    <head>
       <meta charset="utf-8">
       <title> Strava Stuff </title> <!-- what the website is called in a tab-->
-   
-      <style>
-        #loader {
-            border: 12px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 12px solid #444444;
-            width: 70px;
-            height: 70px;
-            animation: spin 1s linear infinite;
-        }
-          
-        @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-          
-        .center {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            margin: auto;
-        }
-    </style>
-   
     </head>
    <body>
       {% extends "navigation.html" %}
       {% block content %}
       <!-- Page content -->
-      <div id="loader" class="center"></div>
+      
         <h1>Strava Links</h1>
         <p><a href="{{ url_for('get_approved') }}">Grant Access to Strava Data</a></p>
         <p><a href="{{ url_for('refresh_data') }}">Refresh strava data</a></p>
@@ -46,22 +19,6 @@
         <p><a href="{{ url_for('summarize') }}">See summary statistics</a></p>
         <p><a href="{{ url_for('activity_list') }}">See all of your activites here</a></p>
 
-
-        <script>
-            document.onreadystatechange = function() {
-                if (document.readyState !== "complete") {
-                    document.querySelector(
-                      "body").style.visibility = "hidden";
-                    document.querySelector(
-                      "#loader").style.visibility = "visible";
-                } else {
-                    document.querySelector(
-                      "#loader").style.display = "none";
-                    document.querySelector(
-                      "body").style.visibility = "visible";
-                }
-            };
-        </script>
       <!-- End Page content -->
       {% endblock %}
    </body>
