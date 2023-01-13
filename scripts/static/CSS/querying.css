@@ -1,0 +1,74 @@
+body {
+    background-color: #435165;
+    margin: 0;
+}
+.query form {
+    display: flex;
+    flex-flow: column;
+    <!-- flex-wrap: wrap; -->
+    justify-content: center;
+    padding-top: 20px;
+}
+
+.query form label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 50px;
+    background-color: #3274d6;
+    color: #ffffff;
+}
+
+.query form input[type="text"] {
+    width: 310px;
+    height: 50px;
+    border: 1px solid #dee0e4;
+    margin-bottom: 20px;
+    padding: 0 15px;
+}
+.query form input[type="submit"] {
+    width: 310px;
+    padding: 15px;
+    margin-top: 20px;
+    background-color: #DFB887;
+    border: 0;
+    cursor: pointer;
+    font-weight: bold;
+    color: #ffffff;
+    transition: background-color 0.2s;
+}
+
+.query form input[type="submit"]:hover {
+    background-color: #2868c7;
+    transition: background-color 0.2s;
+}
+
+<!--
+ body {font-family: Calibri;}
+ .query input[type=text], select {
+     width: 25%;
+     padding: 12px 20px;
+     margin: 8px 10;
+     display: list-item;
+     border: 4px double #39A9DB;
+     border-radius: 8px;
+     box-sizing: border-box;
+
+ }
+ .query input[type=submit] {
+     width: 25%;
+     background-color: #F8E2E6;
+     color: #0000FF;
+     padding: 12px 18px;margin: 20px 0;
+     border: none;
+     border-radius: 6px;
+     cursor: pointer;}
+
+.query div.container {
+    border-radius: 10px;
+    background-color: #39A9DB;
+    padding: 40px;}
+-->
+
+
