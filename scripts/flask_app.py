@@ -94,7 +94,7 @@ def register():
 @app.route('/home')
 def welcome_page():
     if 'loggedin' in session: # only see home if logged in
-        return render_template('home.html')
+        return render_template('home.html', user=session['username'])
     return redirect(url_for('login'))
 
 @app.route('/strava/get_data')
