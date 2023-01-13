@@ -89,7 +89,7 @@ def returning_user_access_token(refresh_token):
     return access_token
 
 # Gets activity data for a user given their access token
-def get_user_activity_data(access_token):
+def get_user_activity_data(access_token, user_id=None):
     page = 1
     activities = pd.DataFrame()
     print("Pulling Data...")
@@ -109,6 +109,10 @@ def get_user_activity_data(access_token):
         print('Data pull has failed: ', ex)
         exit(1)
     else:
-        # save data to a csv
-        activities.to_csv(cwd + '/data/data.csv')
+        if user_id:
+            activities.to_csv(cwd + '/data/' + str(user_id) + '_data.csv')
+        else:
+            # save data to a csv
+            activities.to_csv(cwd + '/data/data.csv')
+
         return activities

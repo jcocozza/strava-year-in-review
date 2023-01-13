@@ -105,13 +105,14 @@ def get_approved():
 def parse_request():
     authorization_code = request.args['code'] # grabbing the authorization code that is returned by strava in the URL
     access_token, refresh_token, athlete_data = get_user_activity_data.get_user_access_token(authorization_code) # getting the access token
-    results = get_user_activity_data.get_user_activity_data(access_token) # returns a dataframe of the data (data is also saved to a csv)
+    results = get_user_activity_data.get_user_activity_data(access_token, session['id']) # returns a dataframe of the data (data is also saved to a csv)
 
     sql_functions.insert_refresh_token(refresh_token) # adds refresh token to user data
     sql_functions.insert_athlete_id(athlete_data['id']) # adds athlete_id to user data
 
-    path = cwd + '/data/data.csv'
+    path = cwd + '/data/' + str(session['id']) + '_data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
+
     return redirect('/strava')
 
 @app.route('/loading_page')
@@ -120,14 +121,13 @@ def loading():
 
 @app.route('/strava/refresh_data')
 def refresh_data():
-
     sql = "SELECT refresh_token FROM users WHERE user_id = '%s'" % (session['id'],)
     data = sql_functions.local_sql_to_df(sql) # get refresh token from db
     refresh_token = data['refresh_token'][0]
     access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
-    results = get_user_activity_data.get_user_activity_data(access_token) # returns a dataframe of the data (data is also saved to a csv)
+    results = get_user_activity_data.get_user_activity_data(access_token, session['id']) # returns a dataframe of the data (data is also saved to a csv)
 
-    path = cwd + '/data/data.csv'
+    path = cwd + '/data/' + str(session['id']) + '_data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
 
     return render_template('strava_page.html') #redirect('/strava')
