@@ -3,25 +3,27 @@
    <head>
       <meta charset="utf-8">
       <title>Query Results</title> <!-- what the website is called in a tab-->
+      <link rel="stylesheet" href="{{ url_for('static', filename='CSS/querying.css') }}">
    </head>
    <body>
       {% extends "navigation.html" %}
       {% block content %}
       <!-- Page content -->
         <p>Enter date to query your strava data</p>
-        <form action="{{ url_for('ad_hoc') }}" method="post">
-            <label for="start_date">
-                <i class="fas fa-user"></i>
-            </label>
-            <input type="text" name="start_date" placeholder="start_date: YYYY-MM-DD" id="start_date" required>
-            <label for="end_date">
-                <i class="fas fa-lock"></i>
-            </label>
-            <input type="end_date" name="end_date" placeholder="end_date: YYYY-MM-DD" id="end_date" required>
-            <div class="msg">{{ msg }}</div>
-            <input type="submit" value="Query Activities">
-        </form>
-
+        <div class="query">
+            <form action="{{ url_for('ad_hoc') }}" method="post">
+                <label for="start_date">
+                    <i class="fas fa-user"></i>
+                </label>
+                <input type="text" name="start_date" placeholder="start_date: YYYY-MM-DD" id="start_date" required>
+                <label for="end_date">
+                    <i class="fas fa-lock"></i>
+                </label>
+                <input type="end_date" name="end_date" placeholder="end_date: YYYY-MM-DD" id="end_date" required>
+                <div class="msg">{{ msg }}</div>
+                <input type="submit" value="Query Activities">
+            </form>
+        </div>
         {% if data_table %}
             <h1>Query Results</h1>
             <h2>Activity Table:</h2>
