@@ -110,7 +110,7 @@ def parse_request():
     sql_functions.insert_refresh_token(refresh_token) # adds refresh token to user data
     sql_functions.insert_athlete_id(athlete_data['id']) # adds athlete_id to user data
 
-    path = cwd + '/data/' + str(session['id']) + 'data.csv'
+    path = cwd + '/data/' + str(session['id']) + '_data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
 
     return redirect('/strava')
@@ -127,7 +127,7 @@ def refresh_data():
     access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
     results = get_user_activity_data.get_user_activity_data(access_token, session['id']) # returns a dataframe of the data (data is also saved to a csv)
 
-    path = cwd + '/data/' + str(session['id']) + 'data.csv'
+    path = cwd + '/data/' + str(session['id']) + '_data.csv'
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
 
     return render_template('strava_page.html') #redirect('/strava')
