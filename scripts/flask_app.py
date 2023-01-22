@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Markup, redirect, request, url_for,session, flash
+from flask import Flask, render_template, Markup, redirect, request, url_for,session
 import sql_functions
 import get_user_activity_data
 from get_user_activity_data import approval_link
@@ -121,9 +121,7 @@ def loading():
 
 @app.route('/strava/refresh_data')
 def refresh_data():
-    sql = "SELECT refresh_token FROM users WHERE user_id = '%s'" % (session['id'],)
-    data = sql_functions.local_sql_to_df(sql) # get refresh token from db
-    refresh_token = data['refresh_token'][0]
+    refresh_token = sql_functions.get_refresh_token()
     access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
     results = get_user_activity_data.get_user_activity_data(access_token, session['id']) # returns a dataframe of the data (data is also saved to a csv)
 
@@ -154,7 +152,7 @@ def activity_list():
 
 @app.route('/strava/ad_hoc', methods=['GET','POST'])
 def ad_hoc():
-    # Output message if something goes wrong...
+    # Output message if something goes wrong
     msg = ''
     # Check if "start_date", "end_date" POST requests exist (user submitted form)
     # date in the form of YYYY-MM-DD
@@ -192,6 +190,24 @@ def ad_hoc():
 @app.route('/strava')
 def strava():
     return render_template('strava_page.html')
+
+@app.route('/strava/activity_analysis')
+def activity_analysis():
+    # Output message if something goes wrong
+    msg = ''
+    # Check if "activity_id" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'activity_id' in request.form:
+        # Create variables for easy access
+        activity_id = request.form['activity_id']
+        # Make sure user fills out info
+        if not activity_id:
+            msg = 'Please fill out the form!'
+        else:
+            refresh_token = sql_functions.get_refresh_token() # getting refresh token for user
+            access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
+            hr_data = get_user_activity_data.get_heart_rate_activity_data(activity_id,access_token)
+
+
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)

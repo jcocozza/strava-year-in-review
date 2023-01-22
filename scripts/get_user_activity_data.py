@@ -116,3 +116,36 @@ def get_user_activity_data(access_token, user_id=None):
             activities.to_csv(cwd + '/data/data.csv')
 
         return activities
+
+def create_hr_url(activity_id):
+    hr_url = "https://www.strava.com/api/v3/activities/%s/streams?keys=heartrate&key_by_type=" % (activity_id, )
+    return hr_url
+
+# Gets heart rate data for a given activity
+def get_heart_rate_activity_data(activity_id, access_token):
+    try: 
+        hr_url = create_hr_url(activity_id)
+        hr_data = call_api(url=hr_url, access_token=access_token).json()
+        hr_dataframe = pd.json_normalize(hr_data)
+    except Exception as ex:
+        print('Heart Rate data pull has failed: ', ex)
+        exit(1)
+    else: 
+        return hr_dataframe
+
+def create_lap_url(activity_id):
+    hr_url = "https://www.strava.com/api/v3/activities/%s/laps" % (activity_id, )
+    return hr_url
+
+def get_activity_laps(activity_id, access_token):
+    try: 
+        lap_url = create_lap_url(activity_id)
+        lap_data = call_api(url=lap_url, access_token=access_token).json()
+        lap_dataframe = pd.json_normalize(lap_data)
+    except Exception as ex:
+        print('Lap data pull has failed: ', ex)
+        exit(1)
+    else: 
+        return lap_dataframe
+
+    
