@@ -1,5 +1,6 @@
 # virtual environment
-stvenv
+venv
+.ipynb_checkpoints
 scripts/app_config.py
 scripts/__pycache__
 __pycache__
