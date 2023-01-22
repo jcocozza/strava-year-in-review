@@ -71,8 +71,11 @@ def get_athlete_id():
     id = local_sql_to_df(sql)['athlete_id'][0]
     return id
 
-def get_refresh_token():
-    sql = "SELECT refresh_token FROM users WHERE user_id = '%s'" % (session['id'],)
+def get_refresh_token(user_id=None):
+    if user_id:
+        sql = "SELECT refresh_token FROM users WHERE user_id = '%s'" % user_id
+    else: 
+        sql = "SELECT refresh_token FROM users WHERE user_id = '%s'" % (session['id'],)
     data = local_sql_to_df(sql) # get refresh token from db
     refresh_token = data['refresh_token'][0]
     return refresh_token
