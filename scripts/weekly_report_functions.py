@@ -71,7 +71,7 @@ def get_week_heartrate_data(week_data, user_id):
     heartrate_data = sql_functions.local_sql_to_df(sql)
     return heartrate_data
 
-def get_timeinterval_lap_data(week_data, user_id): 
+def get_timeinterval_lap_data(week_data, user_id):
     activity_id_list = week_data['id']
     refresh_token = sql_functions.get_refresh_token(user_id=user_id)
     access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
@@ -98,8 +98,8 @@ def get_timeinterval_lap_data(week_data, user_id):
 
 ########## DATA MANIPULATION ##########
 ## get data ##
-week_data = get_week_activity_data(beginning_end, athlete_id)
-week_lap_data = get_timeinterval_lap_data(week_data, user_id)
+#week_data = get_week_activity_data(beginning_end, athlete_id)
+#week_lap_data = get_timeinterval_lap_data(week_data, user_id)
 
 
 ## Weekly Summary ##
@@ -122,7 +122,7 @@ def main():
     alpha_omega = ('2022-11-28', '2022-12-04') # Nov 28 - Dec 4
     week_act_data = get_week_activity_data(alpha_omega, app_config.athlete_id)
     weekly_hr_data = get_week_heartrate_data(week_act_data, app_config.user_id)
-    weekly_lap_data = get_timeinterval_lap_data(week_act_data,app_config.athlete_id)
+    weekly_lap_data = get_timeinterval_lap_data(week_act_data,app_config.user_id)
 
     # temporary to test stuff
     return weekly_lap_data

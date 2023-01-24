@@ -38,7 +38,7 @@ def zones(bin_array):
 
 # Binning heart rate streamed data by zone
 def heart_rate_zones(hr_data, bin_array, labels):
-    series_data = pd.DataFrame(data={'hr_series': hr_data['data'][0], 'dt_series': hr_data['data'][1]})
+    series_data = pd.DataFrame(data={'hr_series': hr_data['data'][0], 'dt_series': hr_data['data'][1]}, index=[0])
     series_data['zone'] = pd.cut(series_data['hr_series'], bins=bin_array, labels=labels) # assign each HR value a zone
     return series_data
 
@@ -59,7 +59,7 @@ def heart_rate_zone_plots(binned_counts):
 
     with open('/static/charts/hr_pie.html', 'w') as f:
         f.write(pie.to_html(include_plotlyjs='cdn'))
-    
+
     with open('/static/charts/hr_hist.html', 'w') as h:
         h.write(hist.to_html(include_plotlyjs='cdn'))
     return None
@@ -79,7 +79,7 @@ def heart_rate_data_plot(series_data, lap_data):
     with open('/static/charts/hr_plot.html', 'w') as f:
         f.write(fig.to_html(include_plotlyjs='cdn'))
     return None
-    #return fig 
+    #return fig
 
 def activity_lap_data_table(lap_data):
     tbl = go.Figure(data=[go.Table(
