@@ -6,6 +6,7 @@ import flask_app
 import pandas as pd
 import os
 import sqlalchemy
+import app_config
 # General Overview of Process:
 # 0) Refresh Strava Data
 # 1) Pull previous week's worth of activities
@@ -22,8 +23,8 @@ cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
 cwd = repo_dir
 
-# Step 0
-flask_app.refresh_data()
+# Step 0 - run this: 
+#flask_app.refresh_data()
 
 # Step 1
 def get_previous_week():
@@ -36,7 +37,7 @@ def get_previous_week():
 # likely will have an email associated with an account
 def get_week_activity_data(beginning_end, athlete_id):
     # Note Query is INCLUSIVE 
-    sql = "SELECT * FROM strava_app_activity_data WHERE `athlete.id` = '%s' AND DATE(state_date_local) BETWEEN '%s' AND '%s';" % (athlete_id, beginning_end[0], beginning_end[1])
+    sql = "SELECT * FROM strava_app_activity_data WHERE `athlete.id` = '%s' AND DATE(start_date_local) BETWEEN '%s' AND '%s';" % (athlete_id, beginning_end[0], beginning_end[1])
     week_data = sql_functions.local_sql_to_df(sql)
     return week_data
 
@@ -65,4 +66,23 @@ def get_week_heartrate_data(week_data, user_id):
     return heartrate_data
 
 # Step 3
+
+
+
+
+# Amalgamation
+def main():
+    flask_app.refresh_data()
+    
+    # get_previous_week()
+    alpha_omega = ('2022-11-28', '2022-12-04') # Nov 28 - Dec 4
+    week_act_data = get_week_activity_data(alpha_omega, app_config.athlete_id)
+    weekly_hr_data = get_week_heartrate_data(week_act_data, app_config.user_id)
+
+    # temporary to test stuff
+    return weekly_hr_data
+
+
+
+
 
