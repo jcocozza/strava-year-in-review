@@ -7,6 +7,7 @@ import os
 import threading
 from threading import Thread
 import weekly_report_functions
+import single_activity_analysis
 
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
@@ -192,26 +193,46 @@ def ad_hoc():
 def strava():
     return render_template('strava_page.html')
 
-@app.route('/strava/activity_analysis')
-def activity_analysis():
-    # Output message if something goes wrong
-    msg = ''
-    # Check if "activity_id" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'activity_id' in request.form:
-        # Create variables for easy access
-        activity_id = request.form['activity_id']
-        # Make sure user fills out info
-        if not activity_id:
-            msg = 'Please fill out the form!'
-        else:
-            refresh_token = sql_functions.get_refresh_token() # getting refresh token for user
-            access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
-            hr_data = get_user_activity_data.get_heart_rate_activity_data(activity_id,access_token)
-
 @app.route('/strava/hr_data')
 def hr_data():
     data = weekly_report_functions.main()
     return data.to_html()
+
+@app.route('/strava/weekly_summary')
+def weekly_summary():
+    #refresh_data()
+
+    # pull all hr and lap data in this step
+
+    return None
+
+@app.route('/strava/weekly_summary/activity_analysis')
+def activity_analysis():
+    bin_array = [0, 150, 160, 205]
+    labels = single_activity_analysis.zones(bin_array)
+
+    activity_id = '8206638986'
+
+    # Data Work
+    hr_data = single_activity_analysis.get_hr_data(activity_id)
+    lap_data = single_activity_analysis.get_lap_data(activity_id)
+
+    series_data = single_activity_analysis.heart_rate_zones(hr_data, bin_array, labels)
+    binned_counts = single_activity_analysis.heart_rate_bin_counts(series_data, bin_array, labels)
+
+    # Plots
+    single_activity_analysis.heart_rate_zone_plots(binned_counts)
+    single_activity_analysis.heart_rate_data_plot(series_data, lap_data)
+    single_activity_analysis.activity_lap_data_table(lap_data)
+
+    # if this doesn't work, consider using the Markup() function for the graphs
+    
+    return render_template('single_activity_analysis.html')
+
+
+    
+
+
 
 
 if __name__ == '__main__':

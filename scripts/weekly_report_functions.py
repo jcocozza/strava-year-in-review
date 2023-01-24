@@ -26,6 +26,7 @@ cwd = repo_dir
 # Step 0 - run this:
 #flask_app.refresh_data()
 
+########## GET DATA ##########
 # Step 1
 def get_previous_week():
     # beginning and end of week tuple
@@ -70,7 +71,45 @@ def get_week_heartrate_data(week_data, user_id):
     heartrate_data = sql_functions.local_sql_to_df(sql)
     return heartrate_data
 
-# Step 3
+def get_timeinterval_lap_data(week_data, user_id): 
+    activity_id_list = week_data['id']
+    refresh_token = sql_functions.get_refresh_token(user_id=user_id)
+    access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
+
+    lap_data_frame = pd.DataFrame()
+    for act in activity_id_list:
+        temp_lap_df = get_user_activity_data.get_activity_laps(activity_id=act,access_token=access_token, user_id=user_id)
+        lap_data_frame = pd.concat([lap_data_frame, temp_lap_df])
+
+    lap_data_frame.to_csv(cwd + '/data/' + str(user_id) + '_hr_data.csv')
+
+    file_path = cwd + '/data/' + str(user_id) + '_hr_data.csv'
+    metadata={
+        "data":sqlalchemy.dialects.mysql.LONGTEXT(),
+        "type":sqlalchemy.dialects.mysql.VARCHAR(225)}
+    sql_functions.upload_data_file_to_local(file_path, 'lap_data', metadata)
+
+    lap_data = pd.DataFrame()
+    t = tuple(activity_id_list)
+    sql = "SELECT * FROM lap_data WHERE `activity_id` IN {}".format(t)
+    lap_data = sql_functions.local_sql_to_df(sql)
+    return lap_data
+########## END GET DATA ##########
+
+########## DATA MANIPULATION ##########
+## get data ##
+week_data = get_week_activity_data(beginning_end, athlete_id)
+week_lap_data = get_timeinterval_lap_data(week_data, user_id)
+
+
+## Weekly Summary ##
+
+
+
+## Individual Activity Summaries ##
+
+
+
 
 
 
@@ -83,9 +122,10 @@ def main():
     alpha_omega = ('2022-11-28', '2022-12-04') # Nov 28 - Dec 4
     week_act_data = get_week_activity_data(alpha_omega, app_config.athlete_id)
     weekly_hr_data = get_week_heartrate_data(week_act_data, app_config.user_id)
+    weekly_lap_data = get_timeinterval_lap_data(week_act_data,app_config.athlete_id)
 
     # temporary to test stuff
-    return weekly_hr_data
+    return weekly_lap_data
 
 if __name__ == '__main__':
     data = main()

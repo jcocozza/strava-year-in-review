@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+   <head>
+      <meta charset="utf-8">
+      <title>Activity Analysis</title> <!-- what the website is called in a tab-->
+   </head>
+   <body>
+      {% extends "navigation.html" %}
+      {% block content %}
+      <!-- Page content -->
+
+      <img src="{{ url_for('static', filename='charts/hr_pie.html') }}">
+      <img src="{{ url_for('static', filename='charts/hr_hist.html') }}">
+      <img src="{{ url_for('static', filename='charts/hr_plot.html') }}">
+      <img src="{{ url_for('static', filename='charts/lap_tbl.html') }}">
+
+      <!-- End Page content -->
+      {% endblock %}
+   </body>
+</html>
