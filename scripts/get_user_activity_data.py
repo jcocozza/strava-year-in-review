@@ -63,7 +63,7 @@ def get_user_tokens(payload):
         print("Refresh Token = {}\n".format(refresh_token))
         return access_token, refresh_token, athlete_data
 
-# For users that have already granted access to strava 
+# For users that have already granted access to strava
 def get_user_access_token_from_refresh_token(payload):
     print("Requesting Token...\n")
     try:
@@ -123,19 +123,15 @@ def create_hr_url(activity_id):
 
 # Gets heart rate data for a given activity
 def get_heart_rate_activity_data(activity_id, access_token, user_id=None):
-    try: 
+    try:
         hr_url = create_hr_url(activity_id)
         hr_data = call_api(url=hr_url, access_token=access_token).json()
         hr_dataframe = pd.json_normalize(hr_data)
+        hr_dataframe.insert(0, "activity_id", [activity_id] * len(hr_dataframe.index))
     except Exception as ex:
         print('Heart Rate data pull has failed: ', ex)
         exit(1)
-    else: 
-        if user_id:
-            hr_dataframe.to_csv(cwd + '/data/' + str(user_id) + '_hr_data.csv')
-        else:
-            # save data to a csv
-            hr_dataframe.to_csv(cwd + '/data/hr_data.csv')
+    else:
         return hr_dataframe
 
 def create_lap_url(activity_id):
@@ -143,19 +139,14 @@ def create_lap_url(activity_id):
     return hr_url
 
 def get_activity_laps(activity_id, access_token, user_id=None):
-    try: 
+    try:
         lap_url = create_lap_url(activity_id)
         lap_data = call_api(url=lap_url, access_token=access_token).json()
         lap_dataframe = pd.json_normalize(lap_data)
+        lap_dataframe.insert(0, "activity_id", [activity_id] * len(lap_dataframe.index))
     except Exception as ex:
         print('Lap data pull has failed: ', ex)
         exit(1)
     else:
-        if user_id:
-            lap_dataframe.to_csv(cwd + '/data/' + str(user_id) + '_lap_data.csv')
-        else:
-            # save data to a csv
-            lap_dataframe.to_csv(cwd + '/data/lap_data.csv')
         return lap_dataframe
 
-    

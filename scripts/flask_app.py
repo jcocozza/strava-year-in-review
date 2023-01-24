@@ -6,6 +6,7 @@ import pandas as pd
 import os
 import threading
 from threading import Thread
+import weekly_report_functions
 
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
@@ -207,6 +208,10 @@ def activity_analysis():
             access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
             hr_data = get_user_activity_data.get_heart_rate_activity_data(activity_id,access_token)
 
+@app.route('/strava/hr_data')
+def hr_data():
+    data = weekly_report_functions.main()
+    return data.to_html()
 
 
 if __name__ == '__main__':
