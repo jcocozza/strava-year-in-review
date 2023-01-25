@@ -45,11 +45,13 @@ def heart_rate_zones(hr_data, bin_array, labels):
         series_data = pd.DataFrame.from_dict(data={'hr_series': literal_eval(hr_data['data'][1]), 'dt_series': literal_eval(hr_data['data'][0])})
         series_data.set_index('dt_series')
         series_data['zone'] = pd.cut(series_data['hr_series'], bins=bin_array, labels=labels) # assign each HR value a zone
+        series_data.insert(2, "series_type", ['distance'] * len(series_data.index))
     
     if hr_data['series_type'][0] == 'time':
         series_data = pd.DataFrame.from_dict(data={'hr_series': literal_eval(hr_data['data'][0]), 'dt_series': literal_eval(hr_data['data'][1])})
         series_data.set_index('dt_series')
         series_data['zone'] = pd.cut(series_data['hr_series'], bins=bin_array, labels=labels) # assign each HR value a zone
+        series_data.insert(2, "series_type", ['time'] * len(series_data.index))
 
     return series_data
 
@@ -79,18 +81,29 @@ def heart_rate_zone_plots(binned_counts):
 def heart_rate_data_plot(series_data, lap_data):
     fig = px.line(series_data, x="dt_series", y="hr_series", title='Heart Rate Data', color_discrete_sequence = ['red'])
 
-    # Add Laps to heart rate graph
-    lap_start_dist = 0
-    for i, (name, begin, end, lap_dist) in enumerate(zip(lap_data['name'], lap_data['start_index'], lap_data['end_index'], lap_data['distance'])):
-        lap_end_dist = lap_start_dist + lap_dist
-        if i % 2 == 0:
-            color = 'blue'
-        else:
-            color = 'green'
-        #fig.add_vrect(x0=begin, x1=end, line_width=0, fillcolor=color, opacity=0.2, annotation_text=name)
-        fig.add_vrect(x0=lap_start_dist, x1=lap_end_dist, line_width=0, fillcolor=color, opacity=0.2, annotation_text=name)
+    if series_data['series_type'][0] == 'distance':
+        # Add Laps to heart rate graph
+        lap_start_dist = 0
+        for i, (name, begin, end, lap_dist) in enumerate(zip(lap_data['name'], lap_data['start_index'], lap_data['end_index'], lap_data['distance'])):
+            lap_end_dist = lap_start_dist + lap_dist
+            if i % 2 == 0:
+                color = 'blue'
+            else:
+                color = 'green'
+            #fig.add_vrect(x0=begin, x1=end, line_width=0, fillcolor=color, opacity=0.2, annotation_text=name)
+            fig.add_vrect(x0=lap_start_dist, x1=lap_end_dist, line_width=0, fillcolor=color, opacity=0.2, annotation_text=name)
 
-        lap_start_dist = lap_end_dist
+            lap_start_dist = lap_end_dist
+            
+    if series_data['series_type'][0] == 'time':
+        # Add Laps to heart rate graph
+        for i, (name, begin, end) in enumerate(zip(lap_data['name'], lap_data['start_index'], lap_data['end_index'])):
+            if i % 2 == 0:
+                color = 'blue'
+            else:
+                color = 'green'
+            fig.add_vrect(x0=begin, x1=end, line_width=0, fillcolor=color, opacity=0.2, annotation_text=name)
+
 
     fig.write_html(cwd + '/scripts/static/charts/hr_plot.html')
 
