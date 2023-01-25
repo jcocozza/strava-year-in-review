@@ -173,22 +173,33 @@ def zone_data(heartrate_data, bin_array, labels):
 
 ########## PLOTS ##########
 #region
-def heart_rate_zone_plots(binned_counts):
+def heart_rate_zone_plots(binned_counts, user_id=None):
     pie = px.pie(binned_counts, values='counts', labels='zones',names='zones', title='Heart Rate Zone Data')
     hist = px.histogram(binned_counts, x="zones", y="counts", hover_data=binned_counts.columns, title='Zone Distribution')
 
-    pie.write_html(cwd + '/scripts/static/charts/weekly_hr_pie.html')
-    hist.write_html(cwd + '/scripts/static/charts/weekly_hr_hist.html')
+    if user_id:
+        pie.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_hr_pie.html')
+        hist.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_hr_hist.html')
+    else:
+        pie.write_html(cwd + '/scripts/static/charts/weekly_hr_pie.html')
+        hist.write_html(cwd + '/scripts/static/charts/weekly_hr_hist.html')
     return None
 
-def mileage_graph(activity_data):
+def mileage_graph(activity_data, user_id=None):
     fig = px.bar(activity_data, x='start_date_local', y='distance', color='type')
-    fig.write_html(cwd + '/scripts/static/charts/weekly_mileage_bar.html')
+    if user_id:
+        fig.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_mileage_bar.html')
+    else:
+        fig.write_html(cwd + '/scripts/static/charts/weekly_mileage_bar.html')
+
     return None
 
-def time_graph(activity_data):
+def time_graph(activity_data, user_id=None):
     fig = px.bar(activity_data, x='start_date_local', y='moving_time', color='type')
-    fig.write_html(cwd + '/scripts/static/charts/weekly_time_bar.html')
+    if user_id:
+        fig.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_time_bar.html')
+    else: 
+        fig.write_html(cwd + '/scripts/static/charts/weekly_time_bar.html')
     return None
 
 #endregion
