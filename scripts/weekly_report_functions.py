@@ -28,7 +28,7 @@ cwd = repo_dir
 #flask_app.refresh_data()
 
 ########## GET DATA ##########
-#region 
+#region
 # Step 1
 def get_previous_week():
     # beginning and end of week tuple
@@ -101,7 +101,7 @@ def get_timeinterval_lap_data(week_data, user_id):
 ########## END GET DATA ##########
 
 ########## DATA ANALYSIS ##########
-#region 
+#region
 
 # Total distance in a given set of activities
 def total_distance(activity_data):
@@ -125,10 +125,11 @@ def zone_data(heartrate_data, bin_array, labels):
     hr_array = []
     dt_array = []
     for row in heartrate_data:
-        hr_array.append(literal_eval(heartrate_data['data'][1]))
-    
+        hr_array = hr_array + literal_eval(heartrate_data['data'][1])
+
     #hr_df = pd.DataFrame(hr_array, columns=['hr_series']) # NEED TO FIX THIS-- pandas is trying to make each elm in array as a column instead of 1 col
     hr_df = pd.DataFrame({'hr_series': hr_array})
+
     count = pd.cut(hr_df['hr_series'], bins=bin_array, labels=labels).value_counts().sort_index()
     binned_counts = pd.DataFrame({'zones':count.index, 'counts':count}).reset_index(drop=True)
 
@@ -148,12 +149,12 @@ def heart_rate_zone_plots(binned_counts):
     return None
 
 def mileage_graph(activity_data):
-    fig = px.bar(activity_data, x='start_data_local', y='distance', color='type')
+    fig = px.bar(activity_data, x='start_date_local', y='distance', color='type')
     fig.write_html(cwd + '/scripts/static/charts/weekly_mileage_bar.html')
     return None
 
 def time_graph(activity_data):
-    fig = px.bar(activity_data, x='start_data_local', y='moving_time', color='type')
+    fig = px.bar(activity_data, x='start_date_local', y='moving_time', color='type')
     fig.write_html(cwd + '/scripts/static/charts/weekly_time_bar.html')
     return None
 

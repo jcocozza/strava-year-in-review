@@ -238,7 +238,7 @@ def weekly_summary():
     time = weekly_report_functions.time_graph(week_activity_data)
 
 
-    return render_template('weekly_summary.html', header=header, activity_table=activity_table)
+    return render_template('weekly_summary.html', header=header, activity_table=Markup(activity_table))
 
 @app.route('/strava/weekly_summary/activity_analysis')
 def activity_analysis():
@@ -260,7 +260,7 @@ def activity_analysis():
     single_activity_analysis.activity_lap_data_table(lap_data)
 
     # if this doesn't work, consider using the Markup() function for the graphs
-    
+
     pie = cwd + '/scripts/static/charts/hr_pie.html'
     hist = cwd + '/scripts/static/charts/hr_hist.html'
     plot = cwd + '/scripts/static/charts/hr_plot.html'
@@ -269,7 +269,7 @@ def activity_analysis():
     return render_template('single_activity_analysis.html')
 
 
-    
+
 
 
 
