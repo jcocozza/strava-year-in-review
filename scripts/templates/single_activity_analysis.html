@@ -3,22 +3,23 @@
    <head>
       <meta charset="utf-8">
       <title>Activity Analysis</title> <!-- what the website is called in a tab-->
+      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
    </head>
    <body>
       {% extends "navigation.html" %}
       {% block content %}
       <!-- Page content -->
-
+        <!--
         <p>{{ pie }}</p>
         <p>{{ hist }}</p>
         <p>{{ plot }}</p>
         <p>{{ tbl }}</p>
-     <!-- 
-      <img src="{{ url_for('static', filename='charts/hr_pie.html') }}">
-      <img src="{{ url_for('static', filename='charts/hr_hist.html') }}">
-      <img src="{{ url_for('static', filename='charts/hr_plot.html') }}">
-      <img src="{{ url_for('static', filename='charts/lap_tbl.html') }}">
-    -->
+            -->
+
+      <iframe src="{{ url_for('static', filename='charts/hr_pie.html') }}" seamless></iframe>
+      <iframe src="{{ url_for('static', filename='charts/hr_hist.html') }}"></iframe>
+      <iframe src="{{ url_for('static', filename='charts/hr_plot.html') }}"></iframe>
+      <iframe src="{{ url_for('static', filename='charts/lap_tbl.html') }}"></iframe>
 
       <!-- End Page content -->
       {% endblock %}
