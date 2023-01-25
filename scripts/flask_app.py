@@ -290,9 +290,9 @@ def activity_analysis():
     binned_counts = single_activity_analysis.heart_rate_bin_counts(series_data, bin_array, labels)
 
     # Plots
-    single_activity_analysis.heart_rate_zone_plots(binned_counts)
-    single_activity_analysis.heart_rate_data_plot(series_data, lap_data)
-    single_activity_analysis.activity_lap_data_table(lap_data)
+    single_activity_analysis.heart_rate_zone_plots(binned_counts, user_id)
+    single_activity_analysis.heart_rate_data_plot(series_data, lap_data, user_id)
+    single_activity_analysis.activity_lap_data_table(lap_data, user_id)
 
     src1 = url_for('static', filename=f'charts/{user_id}_hr_pie.html') 
     src2 = url_for('static', filename=f'charts/{user_id}_hr_hist.html') 
