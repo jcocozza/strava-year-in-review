@@ -155,9 +155,9 @@ def zone_data(heartrate_data, bin_array, labels):
     hr_array = []
     dt_array = []
     for row in heartrate_data:
-        if heartrate_data['series_type'] == 'distance':
+        if heartrate_data['series_type'][0] == 'distance':
             hr_array = hr_array + literal_eval(heartrate_data['data'][1])
-        if heartrate_data['series_type'] == 'time':
+        if heartrate_data['series_type'][0] == 'time':
             hr_array = hr_array + literal_eval(heartrate_data['data'][0])
 
     #hr_df = pd.DataFrame(hr_array, columns=['hr_series']) # NEED TO FIX THIS-- pandas is trying to make each elm in array as a column instead of 1 col

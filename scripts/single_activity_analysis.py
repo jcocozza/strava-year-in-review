@@ -41,12 +41,12 @@ def zones(bin_array):
 def heart_rate_zones(hr_data, bin_array, labels):
 
     # For some reason, the order of the heartrate data is reversed depending on whether there is a time or distance stream
-    if hr_data['series_type'] == 'distance':
+    if hr_data['series_type'][0] == 'distance':
         series_data = pd.DataFrame.from_dict(data={'hr_series': literal_eval(hr_data['data'][1]), 'dt_series': literal_eval(hr_data['data'][0])})
         series_data.set_index('dt_series')
         series_data['zone'] = pd.cut(series_data['hr_series'], bins=bin_array, labels=labels) # assign each HR value a zone
     
-    if hr_data['series_type'] == 'time':
+    if hr_data['series_type'][0] == 'time':
         series_data = pd.DataFrame.from_dict(data={'hr_series': literal_eval(hr_data['data'][0]), 'dt_series': literal_eval(hr_data['data'][1])})
         series_data.set_index('dt_series')
         series_data['zone'] = pd.cut(series_data['hr_series'], bins=bin_array, labels=labels) # assign each HR value a zone
