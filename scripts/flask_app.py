@@ -202,10 +202,15 @@ def ad_hoc():
             mileage = weekly_report_functions.mileage_graph(week_activity_data)
             time = weekly_report_functions.time_graph(week_activity_data)
 
+            src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html') 
+            src2 = url_for('static', filename=f'charts/{user_id}_weekly_hr_hist.html') 
+            src3 = url_for('static', filename=f'charts/{user_id}_weekly_mileage_bar.html') 
+            src4 = url_for('static', filename=f'charts/{user_id}_weekly_time_bar.html') 
+
             msg = 'Data Query Successful'
 
             # redirect to data table with rest of page
-            return render_template('ad_hoc_results.html', msg=msg, data_table=Markup(activity_table))
+            return render_template('ad_hoc_results.html', msg=msg, data_table=Markup(activity_table), src1=src1, src2=src2, src3=src3, src4=src4)
 
     elif request.method == 'POST':
         # Form is empty... (no POST data)
