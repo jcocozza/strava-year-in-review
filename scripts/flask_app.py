@@ -156,6 +156,7 @@ def activity_list():
 
 @app.route('/strava/ad_hoc', methods=['GET','POST'])
 def ad_hoc():
+    user_id = session['id']
     # Output message if something goes wrong
     msg = ''
     # Check if "start_date", "end_date" POST requests exist (user submitted form)
