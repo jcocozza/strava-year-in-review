@@ -7,6 +7,7 @@ import pandas as pd
 import os
 import sqlalchemy
 import app_config
+import plotly.express as px
 # General Overview of Process:
 # 0) Refresh Strava Data
 # 1) Pull previous week's worth of activities
@@ -27,6 +28,7 @@ cwd = repo_dir
 #flask_app.refresh_data()
 
 ########## GET DATA ##########
+#region 
 # Step 1
 def get_previous_week():
     # beginning and end of week tuple
@@ -94,24 +96,68 @@ def get_timeinterval_lap_data(week_data, user_id):
     sql = "SELECT * FROM lap_data WHERE `activity_id` IN {}".format(t)
     lap_data = sql_functions.local_sql_to_df(sql)
     return lap_data
+
+#endregion
 ########## END GET DATA ##########
 
-########## DATA MANIPULATION ##########
-## get data ##
-#week_data = get_week_activity_data(beginning_end, athlete_id)
-#week_lap_data = get_timeinterval_lap_data(week_data, user_id)
+########## DATA ANALYSIS ##########
+#region 
 
+# Total distance in a given set of activities
+def total_distance(activity_data):
+    return sum(activity_data['distance'])
+# Average distance in a given set of activities over a given time period
+def average_distance(activity_data, time_interval):
+    return total_distance(activity_data)/time_interval
 
-## Weekly Summary ##
+# Total time in a given set of activities
+def total_time(activity_data):
+    return sum(activity_data['moving_time'])
+# Average time in a given set of activities over a given time period
+def average_time(activity_data, time_interval)    :
+    return total_time(activity_data)/time_interval
 
+def activity_table(activity_data):
+    tbl = activity_data[['name', 'distance', 'moving_time', 'total_elevation_gain', 'type', 'average_speed', 'average_heartrate']]
+    return tbl.to_html()
 
+def zone_data(heartrate_data, bin_array, labels):
+    hr_array = []
+    dt_array = []
+    for row in heartrate_data:
+        hr_array.append(literal_eval(heartrate_data['data'][1]))
+    
+    hr_df = pd.DataFrame(hr_array, columns=['hr_series'])
+    count = pd.cut(hr_df['hr_series'], bins=bin_array, labels=labels).value_counts().sort_index()
+    binned_counts = pd.DataFrame({'zones':count.index, 'counts':count}).reset_index(drop=True)
 
-## Individual Activity Summaries ##
+    return binned_counts
 
+#endregion
+########## END DATA ANALYSIS ##########
 
+########## PLOTS ##########
+#region
+def heart_rate_zone_plots(binned_counts):
+    pie = px.pie(binned_counts, values='counts', labels='zones',names='zones', title='Heart Rate Zone Data')
+    hist = px.histogram(binned_counts, x="zones", y="counts", hover_data=binned_counts.columns, title='Zone Distribution')
 
+    pie.write_html(cwd + '/scripts/static/charts/weekly_hr_pie.html')
+    hist.write_html(cwd + '/scripts/static/charts/weekly_hr_hist.html')
+    return None
 
+def mileage_graph(activity_data):
+    fig = px.bar(activity_data, x='start_data_local', y='distance', color='type')
+    fig.write_html(cwd + '/scripts/static/charts/weekly_mileage_bar.html')
+    return None
 
+def time_graph(activity_data):
+    fig = px.bar(activity_data, x='start_data_local', y='moving_time', color='type')
+    fig.write_html(cwd + '/scripts/static/charts/weekly_time_bar.html')
+    return None
+
+#endregion
+########## END PLOTS ##########
 
 
 # Amalgamation

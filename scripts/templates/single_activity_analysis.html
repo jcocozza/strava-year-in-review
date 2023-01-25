@@ -9,18 +9,10 @@
       {% extends "navigation.html" %}
       {% block content %}
       <!-- Page content -->
-        <!--
-        <p>{{ pie }}</p>
-        <p>{{ hist }}</p>
-        <p>{{ plot }}</p>
-        <p>{{ tbl }}</p>
-            -->
-
       <iframe src="{{ url_for('static', filename='charts/hr_pie.html') }}" seamless width=1000, height=600></iframe>
       <iframe src="{{ url_for('static', filename='charts/hr_hist.html') }}" seamless width=1000, height=600></iframe>
       <iframe src="{{ url_for('static', filename='charts/hr_plot.html') }}" seamless width=1000, height=600></iframe>
       <iframe src="{{ url_for('static', filename='charts/lap_tbl.html') }}" seamless width=1000, height=600></iframe>
-
       <!-- End Page content -->
       {% endblock %}
    </body>

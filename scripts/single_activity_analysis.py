@@ -9,6 +9,8 @@ cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
 cwd = repo_dir
 
+# This solely deals with Data from MySQL - No strava involvement
+
 ########## GET DATA ##########
 
 def get_hr_data(activity_id):
@@ -69,16 +71,6 @@ def heart_rate_zone_plots(binned_counts):
 
 def heart_rate_data_plot(series_data, lap_data):
     fig = px.line(series_data, x="dt_series", y="hr_series", title='Heart Rate Data', color_discrete_sequence = ['red'])
-
-    print('########## DEBUGGING ##########')
-
-    print('####### Start Index #######')
-    print(lap_data['start_index'])
-    print('####### End Index #######')
-    print(lap_data['end_index'])
-
-    print('########## END DEBUGGING ##########')
-
 
     # Add Laps to heart rate graph
     lap_start_dist = 0

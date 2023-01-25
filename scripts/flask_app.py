@@ -8,6 +8,7 @@ import threading
 from threading import Thread
 import weekly_report_functions
 import single_activity_analysis
+import pendulum
 
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
@@ -200,11 +201,44 @@ def hr_data():
 
 @app.route('/strava/weekly_summary')
 def weekly_summary():
-    #refresh_data()
 
-    # pull all hr and lap data in this step
+    ########## WEEK INFORMATION ##########
+    today = pendulum.now()
+    beginning = today.start_of('week')
+    ending = today.end_of('week')
 
-    return None
+    week_start = beginning.strftime("%Y-%m-%d")
+    week_end = ending.strftime("%Y-%m-%d")
+
+    week_tuple = (week_start, week_end)
+
+    header = f'Summary for {week_start} to {week_end}'
+
+    ########## GETTING DATA ##########
+    athlete_id = sql_functions.get_athlete_id()
+    week_activity_data = weekly_report_functions.get_week_activity_data(week_tuple, athlete_id)
+    week_heartrate_data = weekly_report_functions.get_week_heartrate_data(week_activity_data, session['id'])
+    week_lap_data = weekly_report_functions.get_timeinterval_lap_data(week_activity_data, session['id'])
+
+    bin_array = [0, 150, 160, 205]
+    labels = single_activity_analysis.zones(bin_array)
+
+    ########## DATA ANALYSIS ##########
+    total_mileage = weekly_report_functions.total_distance(week_activity_data)
+    avg_mileage = weekly_report_functions.average_distance(week_activity_data, 7)
+    total_time = weekly_report_functions.total_time(week_activity_data)
+    avg_time = weekly_report_functions.average_time(week_activity_data, 7)
+
+    activity_table = weekly_report_functions.activity_table(week_activity_data)
+    binned_zone_data = weekly_report_functions.zone_data(week_heartrate_data, bin_array, labels)
+
+    ########## PLOTS ##########
+    hr_plot = weekly_report_functions.heart_rate_zone_plots(binned_zone_data)
+    mileage = weekly_report_functions.mileage_graph(week_activity_data)
+    time = weekly_report_functions.time_graph(week_activity_data)
+
+
+    return render_template('weekly_summary.html', header=header, activity_table=activity_table)
 
 @app.route('/strava/weekly_summary/activity_analysis')
 def activity_analysis():
@@ -232,7 +266,7 @@ def activity_analysis():
     plot = cwd + '/scripts/static/charts/hr_plot.html'
     tbl = cwd + '/scripts/static/charts/lap_tbl.html'
 
-    return render_template('single_activity_analysis.html', pie=Markup(pie), hist=Markup(hist), plot=Markup(plot), tbl=Markup(tbl))
+    return render_template('single_activity_analysis.html')
 
 
     
