@@ -190,9 +190,9 @@ def ad_hoc():
 
             ########## DATA ANALYSIS ##########
             total_mileage = weekly_report_functions.total_distance(week_activity_data)
-            avg_mileage = weekly_report_functions.average_distance(week_activity_data, delta)
+            avg_mileage = weekly_report_functions.average_distance(week_activity_data, delta.days)
             total_time = weekly_report_functions.total_time(week_activity_data)
-            avg_time = weekly_report_functions.average_time(week_activity_data, delta)
+            avg_time = weekly_report_functions.average_time(week_activity_data, delta.days)
 
             activity_table = weekly_report_functions.activity_table(week_activity_data)
             binned_zone_data = weekly_report_functions.zone_data(week_heartrate_data, bin_array, labels)
