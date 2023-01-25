@@ -260,10 +260,10 @@ def weekly_summary():
     mileage = weekly_report_functions.mileage_graph(week_activity_data, user_id)
     time = weekly_report_functions.time_graph(week_activity_data, user_id)
 
-    src1 = "{{" + f" url_for('static', filename='charts/{user_id}_weekly_hr_pie.html') " + "}}"
-    src2 = "{{" + f"url_for('static', filename='charts/{user_id}_weekly_hr_hist.html') " + "}}"
-    src3 = "{{" + f" url_for('static', filename='charts/{user_id}_weekly_mileage_bar.html') " + "}}"
-    src4 = "{{" + f" url_for('static', filename='charts/{user_id}_weekly_time_bar.html') " + "}}"
+    src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html') 
+    src2 = url_for('static', filename=f'charts/{user_id}_weekly_hr_hist.html') 
+    src3 = url_for('static', filename=f'charts/{user_id}__weekly_mileage_bar.html') 
+    src4 = url_for('static', filename=f'charts/{user_id}__weekly_time_bar.html') 
 
     return render_template('weekly_summary.html', header=header, activity_table=Markup(activity_table), src1=src1, src2=src2, src3=src3, src4=src4)
 
