@@ -9,6 +9,7 @@ from threading import Thread
 import weekly_report_functions
 import single_activity_analysis
 import pendulum
+import datetime
 
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
@@ -164,25 +165,47 @@ def ad_hoc():
         start_date = request.form['start_date']
         end_date = request.form['end_date']
 
+        # calc number of days difference
+        day1 = datetime.strptime(start_date, "%Y-%m-%d")
+        day2 = datetime.strptime(end_date, "%Y-%m-%d")
+
+        delta = day2 - day1
+
         # Make sure user fills out info
         if not start_date or not end_date:
             msg = 'Please fill out the form!'
         else:
-            athlete_id = sql_functions.get_athlete_id()
-            sql = """
-            SELECT DISTINCT ad.name, ad.id, (ad.distance/1609.344) AS distance, (ad.moving_time/60) AS moving_time, (1609.344/(ad.average_speed*60)) AS average_speed, ad.start_date_local
-            FROM strava_app_activity_data ad
-            WHERE ad.`athlete.id` = '%s'
-            AND ad.start_date_local BETWEEN CAST('%s' AS DATETIME) AND CAST('%s' AS DATETIME);
-            """ % (athlete_id, start_date, end_date)
+            week_tuple = (start_date, end_date)
 
-            # Query database based on start date
-            data = sql_functions.local_sql_to_df(sql)
+            header = f'Summary for {start_date} to {end_date}'
+
+            ########## GETTING DATA ##########
+            athlete_id = sql_functions.get_athlete_id()
+            week_activity_data = weekly_report_functions.get_week_activity_data(week_tuple, athlete_id)
+            week_heartrate_data = weekly_report_functions.get_week_heartrate_data(week_activity_data, session['id'])
+            week_lap_data = weekly_report_functions.get_timeinterval_lap_data(week_activity_data, session['id'])
+
+            bin_array = [0, 150, 160, 205]
+            labels = single_activity_analysis.zones(bin_array)
+
+            ########## DATA ANALYSIS ##########
+            total_mileage = weekly_report_functions.total_distance(week_activity_data)
+            avg_mileage = weekly_report_functions.average_distance(week_activity_data, delta)
+            total_time = weekly_report_functions.total_time(week_activity_data)
+            avg_time = weekly_report_functions.average_time(week_activity_data, delta)
+
+            activity_table = weekly_report_functions.activity_table(week_activity_data)
+            binned_zone_data = weekly_report_functions.zone_data(week_heartrate_data, bin_array, labels)
+
+            ########## PLOTS ##########
+            hr_plot = weekly_report_functions.heart_rate_zone_plots(binned_zone_data)
+            mileage = weekly_report_functions.mileage_graph(week_activity_data)
+            time = weekly_report_functions.time_graph(week_activity_data)
 
             msg = 'Data Query Successful'
 
             # redirect to data table with rest of page
-            return render_template('ad_hoc_results.html', msg=msg, data_table=Markup(data.to_html()))
+            return render_template('ad_hoc_results.html', msg=msg, data_table=Markup(activity_table))
 
     elif request.method == 'POST':
         # Form is empty... (no POST data)

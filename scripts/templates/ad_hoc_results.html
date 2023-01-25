@@ -26,6 +26,14 @@
             <h1>Query Results</h1>
             <h2>Activity Table:</h2>
             <p>{{ data_table }}</p>
+
+            <h2> Week Summary Graphs</h2>
+
+            <iframe src="{{ url_for('static', filename='charts/weekly_hr_pie.html') }}" seamless width=1000, height=600></iframe>
+            <iframe src="{{ url_for('static', filename='charts/weekly_hr_hist.html') }}" seamless width=1000, height=600></iframe>
+            <iframe src="{{ url_for('static', filename='charts/weekly_mileage_bar.html') }}" seamless width=1000, height=600></iframe>
+            <iframe src="{{ url_for('static', filename='charts/weekly_time_bar.html') }}" seamless width=1000, height=600></iframe>
+
         {% endif %}
       <!-- End Page content -->
       {% endblock %}
