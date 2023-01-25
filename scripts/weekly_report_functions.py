@@ -119,6 +119,7 @@ def average_time(activity_data, time_interval)    :
 
 def generate_link(activity_id):
     link = f'https://jcocozza.pythonanywhere.com/strava/weekly_summary/activity_analysis?id={activity_id}'
+    return link
 
 def activity_table(activity_data):
     #tbl = activity_data[['name', 'distance', 'moving_time', 'total_elevation_gain', 'type', 'average_speed', 'average_heartrate']]
