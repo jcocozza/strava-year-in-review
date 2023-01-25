@@ -3,7 +3,7 @@
    <head>
       <meta charset="utf-8">
       <title>Activity Analysis</title> <!-- what the website is called in a tab-->
-      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> 
+      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
    </head>
    <body>
       {% extends "navigation.html" %}
@@ -16,10 +16,10 @@
         <p>{{ tbl }}</p>
             -->
 
-      <iframe src="{{ url_for('static', filename='charts/hr_pie.html') }}" seamless></iframe>
-      <iframe src="{{ url_for('static', filename='charts/hr_hist.html') }}"></iframe>
-      <iframe src="{{ url_for('static', filename='charts/hr_plot.html') }}"></iframe>
-      <iframe src="{{ url_for('static', filename='charts/lap_tbl.html') }}"></iframe>
+      <iframe src="{{ url_for('static', filename='charts/hr_pie.html') }}" seamless width=1000, height=600></iframe>
+      <iframe src="{{ url_for('static', filename='charts/hr_hist.html') }}" seamless width=1000, height=600></iframe>
+      <iframe src="{{ url_for('static', filename='charts/hr_plot.html') }}" seamless width=1000, height=600></iframe>
+      <iframe src="{{ url_for('static', filename='charts/lap_tbl.html') }}" seamless width=1000, height=600></iframe>
 
       <!-- End Page content -->
       {% endblock %}
