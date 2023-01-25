@@ -262,13 +262,14 @@ def weekly_summary():
 
     src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html') 
     src2 = url_for('static', filename=f'charts/{user_id}_weekly_hr_hist.html') 
-    src3 = url_for('static', filename=f'charts/{user_id}__weekly_mileage_bar.html') 
-    src4 = url_for('static', filename=f'charts/{user_id}__weekly_time_bar.html') 
+    src3 = url_for('static', filename=f'charts/{user_id}_weekly_mileage_bar.html') 
+    src4 = url_for('static', filename=f'charts/{user_id}_weekly_time_bar.html') 
 
     return render_template('weekly_summary.html', header=header, activity_table=Markup(activity_table), src1=src1, src2=src2, src3=src3, src4=src4)
 
 @app.route('/strava/weekly_summary/activity_analysis', methods=['GET'])
 def activity_analysis():
+    user_id = session['id']
     activity_id = request.args['id'] # grabbing the authorization code that is returned by strava in the URL
     bin_array = [0, 150, 160, 205]
     labels = single_activity_analysis.zones(bin_array)
@@ -287,20 +288,12 @@ def activity_analysis():
     single_activity_analysis.heart_rate_data_plot(series_data, lap_data)
     single_activity_analysis.activity_lap_data_table(lap_data)
 
-    # if this doesn't work, consider using the Markup() function for the graphs
+    src1 = url_for('static', filename=f'charts/{user_id}_hr_pie.html') 
+    src2 = url_for('static', filename=f'charts/{user_id}_hr_hist.html') 
+    src3 = url_for('static', filename=f'charts/{user_id}_hr_plot.html') 
+    src4 = url_for('static', filename=f'charts/{user_id}_lap_table.html') 
 
-    pie = cwd + '/scripts/static/charts/hr_pie.html'
-    hist = cwd + '/scripts/static/charts/hr_hist.html'
-    plot = cwd + '/scripts/static/charts/hr_plot.html'
-    tbl = cwd + '/scripts/static/charts/lap_tbl.html'
-
-    return render_template('single_activity_analysis.html')
-
-
-
-
-
-
+    return render_template('single_activity_analysis.html', src1=src1, src2=src2, src3=src3, src4=src4)
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)

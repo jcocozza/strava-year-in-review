@@ -68,17 +68,21 @@ def heart_rate_bin_counts(series_data, bin_array, labels):
 
 ########## PLOTS ##########
 
-def heart_rate_zone_plots(binned_counts):
+def heart_rate_zone_plots(binned_counts, user_id=None):
     pie = px.pie(binned_counts, values='counts', labels='zones',names='zones', title='Heart Rate Zone Data')
     hist = px.histogram(binned_counts, x="zones", y="counts", hover_data=binned_counts.columns, title='Zone Distribution')
 
-    pie.write_html(cwd + '/scripts/static/charts/hr_pie.html')
-    hist.write_html(cwd + '/scripts/static/charts/hr_hist.html')
+    if user_id:
+        pie.write_html(cwd + f'/scripts/static/charts/{user_id}_hr_pie.html')
+        hist.write_html(cwd + f'/scripts/static/charts/{user_id}_hr_hist.html')
+    else:
+        pie.write_html(cwd + '/scripts/static/charts/hr_pie.html')
+        hist.write_html(cwd + '/scripts/static/charts/hr_hist.html')
 
     return None
     #return pie, hist
 
-def heart_rate_data_plot(series_data, lap_data):
+def heart_rate_data_plot(series_data, lap_data, user_id=None):
     fig = px.line(series_data, x="dt_series", y="hr_series", title='Heart Rate Data', color_discrete_sequence = ['red'])
 
     if series_data['series_type'][0] == 'distance':
@@ -94,7 +98,7 @@ def heart_rate_data_plot(series_data, lap_data):
             fig.add_vrect(x0=lap_start_dist, x1=lap_end_dist, line_width=0, fillcolor=color, opacity=0.2, annotation_text=name)
 
             lap_start_dist = lap_end_dist
-            
+
     if series_data['series_type'][0] == 'time':
         # Add Laps to heart rate graph
         for i, (name, begin, end) in enumerate(zip(lap_data['name'], lap_data['start_index'], lap_data['end_index'])):
@@ -104,13 +108,15 @@ def heart_rate_data_plot(series_data, lap_data):
                 color = 'green'
             fig.add_vrect(x0=begin, x1=end, line_width=0, fillcolor=color, opacity=0.2, annotation_text=name)
 
-
-    fig.write_html(cwd + '/scripts/static/charts/hr_plot.html')
+    if user_id:
+        fig.write_html(cwd + f'/scripts/static/charts/{user_id}_hr_plot.html')
+    else:
+        fig.write_html(cwd + '/scripts/static/charts/hr_plot.html')
 
     return None
     #return fig
 
-def activity_lap_data_table(lap_data):
+def activity_lap_data_table(lap_data, user_id=None):
     tbl = go.Figure(data=[go.Table(
     header=dict(values=['name','distance', 'moving time', 'elevation gain', 'average speed', 'average heartrate', 'max heartrate'],
                 fill_color='paleturquoise',
@@ -120,7 +126,10 @@ def activity_lap_data_table(lap_data):
                align='left'))
     ])
 
-    tbl.write_html(cwd + '/scripts/static/charts/lap_tbl.html')
+    if user_id:
+        tbl.write_html(cwd + f'/scripts/static/charts/{user_id}_lap_tbl.html')
+    else:
+        tbl.write_html(cwd + '/scripts/static/charts/lap_tbl.html')
 
     return None
 
