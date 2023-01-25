@@ -227,7 +227,12 @@ def activity_analysis():
 
     # if this doesn't work, consider using the Markup() function for the graphs
     
-    return render_template('single_activity_analysis.html')
+    pie = cwd + '/scripts/static/charts/hr_pie.html'
+    hist = cwd + '/scripts/static/charts/hr_hist.html'
+    plot = cwd + '/scripts/static/charts/hr_plot.html'
+    tbl = cwd + '/scripts/static/charts/lap_tbl.html'
+
+    return render_template('single_activity_analysis.html', pie=Markup(pie), hist=Markup(hist), plot=Markup(plot), tbl=Markup(tbl))
 
 
     
