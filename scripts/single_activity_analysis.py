@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import sql_functions
 import os
+from ast import literal_eval
 
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
@@ -38,7 +39,13 @@ def zones(bin_array):
 
 # Binning heart rate streamed data by zone
 def heart_rate_zones(hr_data, bin_array, labels):
-    series_data = pd.DataFrame(data={'hr_series': hr_data['data'][0], 'dt_series': hr_data['data'][1]}, index=[0])
+
+    # Debugging:
+    print(hr_data['data'][0])
+    print('#'*10)
+    print(hr_data['data'][1])
+
+    series_data = pd.DataFrame.from_dict(data={'hr_series': literal_eval(hr_data['data'][0]), 'dt_series': literal_eval(hr_data['data'][1])})
     series_data['zone'] = pd.cut(series_data['hr_series'], bins=bin_array, labels=labels) # assign each HR value a zone
     return series_data
 
@@ -57,11 +64,9 @@ def heart_rate_zone_plots(binned_counts):
     pie = px.pie(binned_counts, values='counts', labels='index', title='Heart Rate Zone Data')
     hist = px.histogram(binned_counts, x="zones", y="counts", hover_data=binned_counts.columns, title='Zone Distribution')
 
-    with open('/static/charts/hr_pie.html', 'w') as f:
-        f.write(pie.to_html(include_plotlyjs='cdn'))
+    pie.write_html(cwd + '/scripts/static/charts/hr_pie.html')
+    hist.write_html(cwd + '/scripts/static/charts/hr_hist.html')
 
-    with open('/static/charts/hr_hist.html', 'w') as h:
-        h.write(hist.to_html(include_plotlyjs='cdn'))
     return None
     #return pie, hist
 
@@ -76,8 +81,8 @@ def heart_rate_data_plot(series_data, lap_data):
             color = 'green'
         fig.add_vrect(x0=begin, x1=end, line_width=0, fillcolor=color, opacity=0.2, annotation_text=name)
 
-    with open('/static/charts/hr_plot.html', 'w') as f:
-        f.write(fig.to_html(include_plotlyjs='cdn'))
+    fig.write_html(cwd + '/scripts/static/charts/hr_plot.html')
+
     return None
     #return fig
 
@@ -91,8 +96,8 @@ def activity_lap_data_table(lap_data):
                align='left'))
     ])
 
-    with open('/static/charts/lap_tbl.html', 'w') as f:
-        f.write(tbl.to_html(include_plotlyjs='cdn'))
-    return tbl
+    tbl.write_html(cwd + '/scripts/static/charts/lap_tbl.html')
+
+    return None
 
 ########## END PLOTS ##########
