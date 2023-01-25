@@ -9,7 +9,7 @@ from threading import Thread
 import weekly_report_functions
 import single_activity_analysis
 import pendulum
-import datetime
+from datetime import datetime
 
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
