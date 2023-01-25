@@ -127,7 +127,8 @@ def zone_data(heartrate_data, bin_array, labels):
     for row in heartrate_data:
         hr_array.append(literal_eval(heartrate_data['data'][1]))
     
-    hr_df = pd.DataFrame(hr_array, columns=['hr_series'])
+    #hr_df = pd.DataFrame(hr_array, columns=['hr_series']) # NEED TO FIX THIS-- pandas is trying to make each elm in array as a column instead of 1 col
+    hr_df = pd.DataFrame({'hr_series': hr_array})
     count = pd.cut(hr_df['hr_series'], bins=bin_array, labels=labels).value_counts().sort_index()
     binned_counts = pd.DataFrame({'zones':count.index, 'counts':count}).reset_index(drop=True)
 
