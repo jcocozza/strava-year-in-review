@@ -199,9 +199,9 @@ def ad_hoc():
             binned_zone_data = weekly_report_functions.zone_data(week_heartrate_data, bin_array, labels)
 
             ########## PLOTS ##########
-            hr_plot = weekly_report_functions.heart_rate_zone_plots(binned_zone_data)
-            mileage = weekly_report_functions.mileage_graph(week_activity_data)
-            time = weekly_report_functions.time_graph(week_activity_data)
+            hr_plot = weekly_report_functions.heart_rate_zone_plots(binned_zone_data, user_id)
+            mileage = weekly_report_functions.mileage_graph(week_activity_data, user_id)
+            time = weekly_report_functions.time_graph(week_activity_data, user_id)
 
             src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html') 
             src2 = url_for('static', filename=f'charts/{user_id}_weekly_hr_hist.html') 
