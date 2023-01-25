@@ -224,7 +224,7 @@ def hr_data():
 
 @app.route('/strava/weekly_summary')
 def weekly_summary():
-
+    user_id = session['id']
     ########## WEEK INFORMATION ##########
     today = pendulum.now()
     beginning = today.start_of('week')
@@ -256,11 +256,10 @@ def weekly_summary():
     binned_zone_data = weekly_report_functions.zone_data(week_heartrate_data, bin_array, labels)
 
     ########## PLOTS ##########
-    hr_plot = weekly_report_functions.heart_rate_zone_plots(binned_zone_data)
-    mileage = weekly_report_functions.mileage_graph(week_activity_data)
-    time = weekly_report_functions.time_graph(week_activity_data)
+    hr_plot = weekly_report_functions.heart_rate_zone_plots(binned_zone_data, user_id)
+    mileage = weekly_report_functions.mileage_graph(week_activity_data, user_id)
+    time = weekly_report_functions.time_graph(week_activity_data, user_id)
 
-    user_id = session['id']
     src1 = "{{" + f" url_for('static', filename='charts/{user_id}_weekly_hr_pie.html') " + "}}"
     src2 = "{{" + f"url_for('static', filename='charts/{user_id}_weekly_hr_hist.html') " + "}}"
     src3 = "{{" + f" url_for('static', filename='charts/{user_id}_weekly_mileage_bar.html') " + "}}"
