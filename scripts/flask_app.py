@@ -263,12 +263,13 @@ def weekly_summary():
 
     return render_template('weekly_summary.html', header=header, activity_table=Markup(activity_table))
 
-@app.route('/strava/weekly_summary/activity_analysis')
+@app.route('/strava/weekly_summary/activity_analysis', methods=['GET'])
 def activity_analysis():
+    activity_id = request.args['id'] # grabbing the authorization code that is returned by strava in the URL
     bin_array = [0, 150, 160, 205]
     labels = single_activity_analysis.zones(bin_array)
 
-    activity_id = '8206638986'
+    #activity_id = '8206638986'
 
     # Data Work
     hr_data = single_activity_analysis.get_hr_data(activity_id)
