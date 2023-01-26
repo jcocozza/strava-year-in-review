@@ -119,11 +119,23 @@ def parse_request():
 
     return redirect('/strava')
 
-@app.route('/loading_page')
-def loading(process, redirect):
+@app.route('/loading_page', methods=['GET'])
+def loading():
 
-    process_url = url_for(process) # "{{ url_for('refresh_data') }}"
-    redirect_url = url_for(redirect)   #"{{ url_for('strava') }}"
+    p = request.args['process']
+    r = request.args['redirect']
+
+    print('########## DEBUGGING ##########')
+    #region
+    print('####### process #######')
+    print(p)
+    print('####### request #######')
+    print(r)
+    print('########## END DEBUGGING ##########')
+    #endregion
+
+    process_url = url_for(p) # "{{ url_for('refresh_data') }}"
+    redirect_url = url_for(r)   #"{{ url_for('strava') }}"
 
     return render_template('loading.html', redirect=redirect_url, process=process_url)
 
@@ -207,10 +219,10 @@ def ad_hoc():
             mileage = weekly_report_functions.mileage_graph(week_activity_data, user_id)
             time = weekly_report_functions.time_graph(week_activity_data, user_id)
 
-            src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html') 
-            src2 = url_for('static', filename=f'charts/{user_id}_weekly_hr_hist.html') 
-            src3 = url_for('static', filename=f'charts/{user_id}_weekly_mileage_bar.html') 
-            src4 = url_for('static', filename=f'charts/{user_id}_weekly_time_bar.html') 
+            src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html')
+            src2 = url_for('static', filename=f'charts/{user_id}_weekly_hr_hist.html')
+            src3 = url_for('static', filename=f'charts/{user_id}_weekly_mileage_bar.html')
+            src4 = url_for('static', filename=f'charts/{user_id}_weekly_time_bar.html')
 
             msg = 'Data Query Successful'
 
@@ -270,21 +282,19 @@ def weekly_summary():
     mileage = weekly_report_functions.mileage_graph(week_activity_data, user_id)
     time = weekly_report_functions.time_graph(week_activity_data, user_id)
 
-    src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html') 
-    src2 = url_for('static', filename=f'charts/{user_id}_weekly_hr_hist.html') 
-    src3 = url_for('static', filename=f'charts/{user_id}_weekly_mileage_bar.html') 
-    src4 = url_for('static', filename=f'charts/{user_id}_weekly_time_bar.html') 
+    src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html')
+    src2 = url_for('static', filename=f'charts/{user_id}_weekly_hr_hist.html')
+    src3 = url_for('static', filename=f'charts/{user_id}_weekly_mileage_bar.html')
+    src4 = url_for('static', filename=f'charts/{user_id}_weekly_time_bar.html')
 
     return render_template('weekly_summary.html', header=header, activity_table=Markup(activity_table), src1=src1, src2=src2, src3=src3, src4=src4)
 
 @app.route('/strava/weekly_summary/activity_analysis', methods=['GET'])
 def activity_analysis():
     user_id = session['id']
-    activity_id = request.args['id'] # grabbing the authorization code that is returned by strava in the URL
+    activity_id = request.args['id'] # grabbing the activity_id returned in the URL
     bin_array = [0, 150, 160, 205]
     labels = single_activity_analysis.zones(bin_array)
-
-    #activity_id = '8206638986'
 
     # Data Work
     hr_data = single_activity_analysis.get_hr_data(activity_id)
@@ -298,10 +308,10 @@ def activity_analysis():
     single_activity_analysis.heart_rate_data_plot(series_data, lap_data, user_id)
     single_activity_analysis.activity_lap_data_table(lap_data, user_id)
 
-    src1 = url_for('static', filename=f'charts/{user_id}_hr_pie.html') 
-    src2 = url_for('static', filename=f'charts/{user_id}_hr_hist.html') 
-    src3 = url_for('static', filename=f'charts/{user_id}_hr_plot.html') 
-    src4 = url_for('static', filename=f'charts/{user_id}_lap_table.html') 
+    src1 = url_for('static', filename=f'charts/{user_id}_hr_pie.html')
+    src2 = url_for('static', filename=f'charts/{user_id}_hr_hist.html')
+    src3 = url_for('static', filename=f'charts/{user_id}_hr_plot.html')
+    src4 = url_for('static', filename=f'charts/{user_id}_lap_table.html')
 
     return render_template('single_activity_analysis.html', src1=src1, src2=src2, src3=src3, src4=src4)
 
