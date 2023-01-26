@@ -1,8 +1,11 @@
+########## IMPORTS ##########
+#region - imports
 import app_config
 from strava_api_throttle import call_api
 import pandas as pd
 import os
 import requests
+#endregion - imports
 
 # A quick overview of how this works:
 # The developer needs to create an application through strava
@@ -15,10 +18,12 @@ import requests
 # The post request will return an access token.
 # The access token can then be used with a GET request to https://www.strava.com/api/v3/athlete/activities for data
 
+########## Setting working directory ##########
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
 cwd = repo_dir
 
+########## PARAMETERS ##########
 approval_link = 'https://www.strava.com/oauth/authorize?client_id=89519&response_type=code&redirect_uri=http://jcocozza.pythonanywhere.com/strava/exchange_token&approval_prompt=force&scope=activity:read'
 auth_url = "https://www.strava.com/oauth/token"
 activites_url = "https://www.strava.com/api/v3/athlete/activities"
@@ -117,6 +122,7 @@ def get_user_activity_data(access_token, user_id=None):
 
         return activities
 
+# Heartrate url for interacting with Strava API to get heartrate streams
 def create_hr_url(activity_id):
     hr_url = "https://www.strava.com/api/v3/activities/%s/streams?keys=heartrate&key_by_type=" % (activity_id, )
     return hr_url
@@ -134,10 +140,12 @@ def get_heart_rate_activity_data(activity_id, access_token, user_id=None):
     else:
         return hr_dataframe
 
+# Lap url for interacting with Strava API to get lap streams
 def create_lap_url(activity_id):
     hr_url = "https://www.strava.com/api/v3/activities/%s/laps" % (activity_id, )
     return hr_url
 
+# Gets Laps for an individual activity; specifiy user_id to save file properly
 def get_activity_laps(activity_id, access_token, user_id=None):
     try:
         lap_url = create_lap_url(activity_id)

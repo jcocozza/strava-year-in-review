@@ -1,3 +1,5 @@
+########## IMPORTS ##########
+#region - imports
 import get_user_activity_data
 import sql_functions
 from ast import literal_eval # used to covert an array string to an actual array type e.g. "[0,1,1,1]" --> [0,1,1,1]
@@ -8,6 +10,8 @@ import os
 import sqlalchemy
 import app_config
 import plotly.express as px
+#endregion - imports
+
 # General Overview of Process:
 # 0) Refresh Strava Data
 # 1) Pull previous week's worth of activities
@@ -20,31 +24,24 @@ import plotly.express as px
 # 5) Report Generation
 # 6) Email Delivery
 
+########## Setting working directory ##########
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
 cwd = repo_dir
 
-# Step 0 - run this:
-#flask_app.refresh_data()
-
 ########## GET DATA ##########
-#region
-# Step 1
-def get_previous_week():
-    # beginning and end of week tuple
-    # In form (YYYY-MM-DD, YYYY-MM-DD)
-    alpha_omega = ()
-    return alpha_omega
+#region - Get Data
 
-# need to figure a way to get athlete id
-# likely will have an email associated with an account
+# Gets data between a time interval tuple, beginning_end
+# beginning_end = ('YYYY-MM-DD','YYYY-MM-DD')
 def get_week_activity_data(beginning_end, athlete_id):
     # Note Query is INCLUSIVE
     sql = "SELECT * FROM strava_app_activity_data WHERE `athlete.id` = '%s' AND DATE(start_date_local) BETWEEN '%s' AND '%s';" % (athlete_id, beginning_end[0], beginning_end[1])
     week_data = sql_functions.local_sql_to_df(sql)
     return week_data
 
-# Step 2
+# Given some activity data pull the heart rate data for those activities
+# Pulls FROM strava and uploads to MySQL database
 def get_week_heartrate_data(week_data, user_id):
     # Step 2a
     activity_id_list = week_data['id']

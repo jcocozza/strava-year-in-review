@@ -1,3 +1,5 @@
+########## IMPORTS ##########
+#region - imports
 from flask import Flask, render_template, Markup, redirect, request, url_for,session
 import sql_functions
 import get_user_activity_data
@@ -10,7 +12,9 @@ import weekly_report_functions
 import single_activity_analysis
 import pendulum
 from datetime import datetime
+#endregion - imports
 
+########## Setting working directory ##########
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
 cwd = repo_dir
@@ -18,10 +22,19 @@ cwd = repo_dir
 app = Flask(__name__)
 app.secret_key = 'blahblahblahblahblah'
 
+# Base Route; Redirects to to /home for password protection
 @app.route('/')
 def enter():
     return redirect(url_for('welcome_page'))
 
+# Will welcome user provided they are logged in; otherwise redirect to login
+@app.route('/home')
+def welcome_page():
+    if 'loggedin' in session: # only see home if logged in
+        return render_template('home.html', user=session['username'])
+    return redirect(url_for('login'))
+
+# Requires username and password to login
 @app.route('/login', methods=['GET','POST'])
 def login():
     # Output message if something goes wrong...
@@ -50,6 +63,8 @@ def login():
 
     return render_template('login.html', msg=msg)
 
+# Drops user credentials from the session 
+# redirects to login page
 @app.route('/logout')
 def logout():
     # Remove session data, this will log the user out
@@ -59,6 +74,8 @@ def logout():
    # Redirect to login page
    return redirect(url_for('login'))
 
+# adjacent to login; user inputs username, password
+# does NOT auto-login; redirects to login page
 @app.route('/register', methods=['GET','POST'])
 def register():
     # Output message if something goes wrong...
@@ -95,16 +112,33 @@ def register():
     # Show registration form with message (if any)
     return render_template('register.html', msg=msg)
 
-@app.route('/home')
-def welcome_page():
-    if 'loggedin' in session: # only see home if logged in
-        return render_template('home.html', user=session['username'])
-    return redirect(url_for('login'))
+# any time loading page is called, it will include a process to run, and a redirect url to go to when the process is completed
+# basically renders a little loading simple
+@app.route('/loading_page', methods=['GET'])
+def loading():
+    
+    p = request.args['process']
+    r = request.args['redirect']
+    process_url = url_for(p) 
+    redirect_url = url_for(r)   
 
+    return render_template('loading.html', redirect=redirect_url, process=process_url)
+
+########## STRAVA API CONNECTION ##########
+#region - Strava
+
+# Page for all strava stuff; currently just a bunch of links
+@app.route('/strava')
+def strava():
+    return render_template('strava_page.html')
+
+#region - Initial Strava Connection
+# handling user approval and getting authorization code
 @app.route('/strava/get_data')
 def get_approved():
     return redirect(approval_link, code=302)
 
+# using authorization code (returned by link in /strava/get_data) to get tokens for users and put them in the database
 @app.route('/strava/exchange_token', methods=['GET'])
 def parse_request():
     authorization_code = request.args['code'] # grabbing the authorization code that is returned by strava in the URL
@@ -118,27 +152,10 @@ def parse_request():
     sql_functions.upload_data_file_to_local(path, 'strava_app_activity_data')
 
     return redirect('/strava')
+#endregion - Initial Strava Connection
 
-@app.route('/loading_page', methods=['GET'])
-def loading():
-
-    p = request.args['process']
-    r = request.args['redirect']
-
-    print('########## DEBUGGING ##########')
-    #region
-    print('####### process #######')
-    print(p)
-    print('####### request #######')
-    print(r)
-    print('########## END DEBUGGING ##########')
-    #endregion
-
-    process_url = url_for(p) # "{{ url_for('refresh_data') }}"
-    redirect_url = url_for(r)   #"{{ url_for('strava') }}"
-
-    return render_template('loading.html', redirect=redirect_url, process=process_url)
-
+#region - Strava Tasks
+# For users that exists in the database and have already connected to strava this will refresh their strava data
 @app.route('/strava/refresh_data')
 def refresh_data():
     refresh_token = sql_functions.get_refresh_token()
@@ -150,6 +167,7 @@ def refresh_data():
 
     return render_template('strava_page.html') #redirect('/strava')
 
+# Summary of yearly running activities
 @app.route('/strava/summary_data')
 def summarize():
     athlete_id = sql_functions.get_athlete_id()
@@ -160,6 +178,7 @@ def summarize():
     data = sql_functions.local_sql_to_df(query)
     return render_template('summary.html', data_table=Markup(data.to_html()))
 
+# List of Yearly Running Activities
 @app.route('/strava/activity_list')
 def activity_list():
     athlete_id = sql_functions.get_athlete_id()
@@ -170,6 +189,7 @@ def activity_list():
     data = sql_functions.local_sql_to_df(query)
     return render_template('activity_list.html', data_table=Markup(data.to_html()))
 
+# Query Activites in a Date Range; Provides some summary statistcs about them
 @app.route('/strava/ad_hoc', methods=['GET','POST'])
 def ad_hoc():
     user_id = session['id']
@@ -235,19 +255,15 @@ def ad_hoc():
     # Show page
     return render_template('ad_hoc_results.html', msg=msg)
 
-@app.route('/strava')
-def strava():
-    return render_template('strava_page.html')
-
-@app.route('/strava/hr_data')
-def hr_data():
-    data = weekly_report_functions.main()
-    return data.to_html()
-
+# Provides a weekly summary of all strava activity for the most recent week
+# VERY similar to ad_hoc except for the present week
 @app.route('/strava/weekly_summary')
 def weekly_summary():
+    ########## PARAMETERS ##########
+    bin_array = [0, 150, 160, 205]
+    labels = single_activity_analysis.zones(bin_array)
     user_id = session['id']
-    ########## WEEK INFORMATION ##########
+    ####### WEEK INFORMATION #######
     today = pendulum.now()
     beginning = today.start_of('week')
     ending = today.end_of('week')
@@ -264,9 +280,6 @@ def weekly_summary():
     week_activity_data = weekly_report_functions.get_week_activity_data(week_tuple, athlete_id)
     week_heartrate_data = weekly_report_functions.get_week_heartrate_data(week_activity_data, session['id'])
     week_lap_data = weekly_report_functions.get_timeinterval_lap_data(week_activity_data, session['id'])
-
-    bin_array = [0, 150, 160, 205]
-    labels = single_activity_analysis.zones(bin_array)
 
     ########## DATA ANALYSIS ##########
     total_mileage = weekly_report_functions.total_distance(week_activity_data)
@@ -289,21 +302,23 @@ def weekly_summary():
 
     return render_template('weekly_summary.html', header=header, activity_table=Markup(activity_table), src1=src1, src2=src2, src3=src3, src4=src4)
 
+# An analysis of an individual activity; will come with ?activity_id=XXXXXXXX in url for the GET method
 @app.route('/strava/weekly_summary/activity_analysis', methods=['GET'])
 def activity_analysis():
+    ########## PARAMETERS ##########
     user_id = session['id']
     activity_id = request.args['id'] # grabbing the activity_id returned in the URL
     bin_array = [0, 150, 160, 205]
     labels = single_activity_analysis.zones(bin_array)
 
-    # Data Work
+    ########## DATA MANIPULATION ##########
     hr_data = single_activity_analysis.get_hr_data(activity_id)
     lap_data = single_activity_analysis.get_lap_data(activity_id)
 
     series_data = single_activity_analysis.heart_rate_zones(hr_data, bin_array, labels)
     binned_counts = single_activity_analysis.heart_rate_bin_counts(series_data, bin_array, labels)
 
-    # Plots
+    ########## PLOTS ##########
     single_activity_analysis.heart_rate_zone_plots(binned_counts, user_id)
     single_activity_analysis.heart_rate_data_plot(series_data, lap_data, user_id)
     single_activity_analysis.activity_lap_data_table(lap_data, user_id)
@@ -314,6 +329,9 @@ def activity_analysis():
     src4 = url_for('static', filename=f'charts/{user_id}_lap_table.html')
 
     return render_template('single_activity_analysis.html', src1=src1, src2=src2, src3=src3, src4=src4)
+#endregion - Strava Tasks
+#endregion - Strava
+
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)

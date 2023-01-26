@@ -1,7 +1,10 @@
+########## IMPORTS ##########
+#region - imports
 from ratelimit import limits, sleep_and_retry
 import requests
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+#endregion - imports
 
 # This handles GET calls to the Strava API to get data
 # Uses the wrapper to limit calls 
