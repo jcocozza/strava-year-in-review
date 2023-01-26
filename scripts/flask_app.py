@@ -120,8 +120,12 @@ def parse_request():
     return redirect('/strava')
 
 @app.route('/loading_page')
-def loading():
-    return render_template('loading.html')
+def loading(process, redirect):
+
+    process_url = url_for(process) # "{{ url_for('refresh_data') }}"
+    redirect_url = url_for(redirect)   #"{{ url_for('strava') }}"
+
+    return render_template('loading.html', redirect=redirect_url, process=process_url)
 
 @app.route('/strava/refresh_data')
 def refresh_data():
