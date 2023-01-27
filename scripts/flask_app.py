@@ -309,24 +309,14 @@ def activity_analysis():
     user_id = session['id']
     activity_id = request.args['id'] # grabbing the activity_id returned in the URL
     bin_array = [0, 150, 160, 205]
-    labels = single_activity_analysis.zones(bin_array)
+    
+    single_activity_analysis.do_activity_analysis(activity_id, user_id, bin_array)
 
-    ########## DATA MANIPULATION ##########
-    hr_data = single_activity_analysis.get_hr_data(activity_id)
-    lap_data = single_activity_analysis.get_lap_data(activity_id)
-
-    series_data = single_activity_analysis.heart_rate_zones(hr_data, bin_array, labels)
-    binned_counts = single_activity_analysis.heart_rate_bin_counts(series_data, bin_array, labels)
-
-    ########## PLOTS ##########
-    single_activity_analysis.heart_rate_zone_plots(binned_counts, user_id)
-    single_activity_analysis.heart_rate_data_plot(series_data, lap_data, user_id)
-    single_activity_analysis.activity_lap_data_table(lap_data, user_id)
-
-    src1 = url_for('static', filename=f'charts/{user_id}_hr_pie.html')
-    src2 = url_for('static', filename=f'charts/{user_id}_hr_hist.html')
-    src3 = url_for('static', filename=f'charts/{user_id}_hr_plot.html')
-    src4 = url_for('static', filename=f'charts/{user_id}_lap_table.html')
+    # urls for plots and graphs; <iframed> into the html page of the individual activity (html within html)
+    src1 = url_for('static', filename=f'charts/{user_id}_{activity_id}_hr_pie.html')
+    src2 = url_for('static', filename=f'charts/{user_id}_{activity_id}_hr_hist.html')
+    src3 = url_for('static', filename=f'charts/{user_id}_{activity_id}_hr_plot.html')
+    src4 = url_for('static', filename=f'charts/{user_id}_{activity_id}_lap_table.html')
 
     return render_template('single_activity_analysis.html', src1=src1, src2=src2, src3=src3, src4=src4)
 #endregion - Strava Tasks
