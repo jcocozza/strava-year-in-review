@@ -1,3 +1,5 @@
+########## IMPORTS ##########
+#region - imports
 from genericpath import exists
 import pandas as pd
 import sqlalchemy
@@ -11,6 +13,7 @@ from flask import session
 # For handling duplicates
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import Insert
+#endregion - imports
 
 # generates an engine string for connecting to a mysql database
 # returns a string

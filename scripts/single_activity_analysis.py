@@ -1,17 +1,22 @@
+########## IMPORTS ##########
+#region - imports
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
 import sql_functions
 import os
 from ast import literal_eval
+#endregion - imports
 
+########## Setting working directory ##########
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
 cwd = repo_dir
 
-# This solely deals with Data from MySQL - No strava involvement
-
 ########## GET DATA ##########
+#region - Get Data
+# Both functions are self explanatory - pulling data from MySQL Database
+# This solely deals with Data from MySQL - No strava involvement
 
 def get_hr_data(activity_id):
     sql = "SELECT * FROM heartrate_data WHERE `activity_id` = '%s'" % activity_id
@@ -23,9 +28,11 @@ def get_lap_data(activity_id):
     lap_data = sql_functions.local_sql_to_df(sql)
     return lap_data
 
+#endregion - Get Data
 ########## END GET DATA ##########
 
 ########## DATA MANIPULATION ##########
+#region - Data Manipulation
 
 # takes in an array of increasing heart rate zone values and returns zone labels for them
 # e.g. [0, 150, 160, 205] will return ['Zone 1', 'Zone 2', 'Zone 3']
@@ -64,10 +71,13 @@ def heart_rate_bin_counts(series_data, bin_array, labels):
 
     return binned_counts
 
+#endregion - Data Manipulation
 ########## END MANIPULATION ##########
 
 ########## PLOTS ##########
+#region - Plots
 
+# Creates a pie chart, histogram of heart rate data amounts; broken down by zone; include user_id to save files properly
 def heart_rate_zone_plots(binned_counts, user_id=None):
     pie = px.pie(binned_counts, values='counts', labels='zones',names='zones', title='Heart Rate Zone Data')
     hist = px.histogram(binned_counts, x="zones", y="counts", hover_data=binned_counts.columns, title='Zone Distribution')
@@ -82,6 +92,7 @@ def heart_rate_zone_plots(binned_counts, user_id=None):
     return None
     #return pie, hist
 
+# Creates a plot of heartrate data based on series data(either distance or time); include user_id to save files properly
 def heart_rate_data_plot(series_data, lap_data, user_id=None):
     fig = px.line(series_data, x="dt_series", y="hr_series", title='Heart Rate Data', color_discrete_sequence = ['red'])
 
@@ -116,6 +127,7 @@ def heart_rate_data_plot(series_data, lap_data, user_id=None):
     return None
     #return fig
 
+#Generates a table of lap activity data; include user_id to save files properly
 def activity_lap_data_table(lap_data, user_id=None):
     tbl = go.Figure(data=[go.Table(
     header=dict(values=['name','distance', 'moving time', 'elevation gain', 'average speed', 'average heartrate', 'max heartrate'],
@@ -132,5 +144,5 @@ def activity_lap_data_table(lap_data, user_id=None):
         tbl.write_html(cwd + '/scripts/static/charts/lap_tbl.html')
 
     return None
-
+#endregion - Plots
 ########## END PLOTS ##########
