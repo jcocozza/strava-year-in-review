@@ -184,12 +184,12 @@ def activity_table(activity_data):
                     <th>average_heartrate</th>
                 </tr>"""
 
-    for id,date,name,dist,mt,teg,type,avg_speed,avg_hr  in zip(activity_data['id'], activity_data['start_date_local'], activity_data['name'], activity_data['distance'], activity_data['moving_time'], activity_data['total_elevation_gain'], activity_data['type'], activity_data['average_speed'], activity_data['average_heartrate']):
+    for id,date,name,dist,mt,teg,type,avg_speed,avg_hr in zip(activity_data['id'], activity_data['start_date_local'], activity_data['name'], activity_data['distance'], activity_data['moving_time'], activity_data['total_elevation_gain'], activity_data['type'], activity_data['average_speed'], activity_data['average_heartrate']):
         link = generate_link(id)
 
         html += f""" <tr>
                          <td><a href={link}>{name}</a></td>
-                         <td>{date}<td>
+                         <td>{date}</td>
                          <td>{dist}</td>
                          <td>{mt}</td>
                          <td>{teg}</td>
