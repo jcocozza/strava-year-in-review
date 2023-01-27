@@ -118,36 +118,6 @@ def generate_link(activity_id):
     link = f'https://jcocozza.pythonanywhere.com/strava/weekly_summary/activity_analysis?id={activity_id}'
     return link
 
-def activity_table(activity_data):
-    #tbl = activity_data[['name', 'distance', 'moving_time', 'total_elevation_gain', 'type', 'average_speed', 'average_heartrate']]
-    
-    html =  """<table>
-                <tr>
-                    <th>name</th>
-                    <th>distance</th>
-                    <th>moving_time</th>
-                    <th>total_elevation_gain</th>
-                    <th>type</th>
-                    <th>average_speed</th>
-                    <th>average_heartrate</th>
-                </tr>"""
-
-    for id,name,dist,mt,teg,type,avg_speed,avg_hr  in zip(activity_data['id'], activity_data['name'], activity_data['distance'], activity_data['moving_time'], activity_data['total_elevation_gain'], activity_data['type'], activity_data['average_speed'], activity_data['average_heartrate']):
-        link = generate_link(id)
-
-        html += f""" <tr>
-                         <td><a href={link}>{name}</a></td>
-                         <td>{dist}</td>
-                         <td>{mt}</td>
-                         <td>{teg}</td>
-                         <td>{type}</td>
-                         <td>{avg_speed}</td>
-                         <td>{avg_hr}</td>
-                        </tr>"""
-    html += """</table>"""
-    
-    return html #tbl.to_html()
-
 def zone_data(heartrate_data, bin_array, labels):
     hr_array = []
     dt_array = []
@@ -198,6 +168,38 @@ def time_graph(activity_data, user_id=None):
     else: 
         fig.write_html(cwd + '/scripts/static/charts/weekly_time_bar.html')
     return None
+
+def activity_table(activity_data):
+    #tbl = activity_data[['name', 'distance', 'moving_time', 'total_elevation_gain', 'type', 'average_speed', 'average_heartrate']]
+    
+    html =  """<table>
+                <tr>
+                    <th>name</th>
+                    <th>date</th>
+                    <th>distance</th>
+                    <th>moving_time</th>
+                    <th>total_elevation_gain</th>
+                    <th>type</th>
+                    <th>average_speed</th>
+                    <th>average_heartrate</th>
+                </tr>"""
+
+    for id,date,name,dist,mt,teg,type,avg_speed,avg_hr  in zip(activity_data['id'], activity_data['start_date_local'], activity_data['name'], activity_data['distance'], activity_data['moving_time'], activity_data['total_elevation_gain'], activity_data['type'], activity_data['average_speed'], activity_data['average_heartrate']):
+        link = generate_link(id)
+
+        html += f""" <tr>
+                         <td><a href={link}>{name}</a></td>
+                         <td>{date}<td>
+                         <td>{dist}</td>
+                         <td>{mt}</td>
+                         <td>{teg}</td>
+                         <td>{type}</td>
+                         <td>{avg_speed}</td>
+                         <td>{avg_hr}</td>
+                        </tr>"""
+    html += """</table>"""
+    
+    return html #tbl.to_html()
 
 #endregion
 ########## END PLOTS ##########
