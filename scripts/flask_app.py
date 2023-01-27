@@ -316,7 +316,7 @@ def activity_analysis():
     src1 = url_for('static', filename=f'charts/{user_id}_{activity_id}_hr_pie.html')
     src2 = url_for('static', filename=f'charts/{user_id}_{activity_id}_hr_hist.html')
     src3 = url_for('static', filename=f'charts/{user_id}_{activity_id}_hr_plot.html')
-    src4 = url_for('static', filename=f'charts/{user_id}_{activity_id}_lap_table.html')
+    src4 = url_for('static', filename=f'charts/{user_id}_{activity_id}_lap_tbl.html')
 
     return render_template('single_activity_analysis.html', src1=src1, src2=src2, src3=src3, src4=src4)
 #endregion - Strava Tasks
