@@ -36,7 +36,7 @@ def get_lap_data(activity_id):
 
 # takes in an array of increasing heart rate zone values and returns zone labels for them
 # e.g. [0, 150, 160, 205] will return ['Zone 1', 'Zone 2', 'Zone 3']
-# 0-150 = Z1, 150-160 = Z2 160-205 = Z3
+# e.g. 0-150 = Zone 1, 150-160 = Zone 2 160-205 = Zone 3
 def zones(bin_array):
     # bin_array = [0,150,160,210,250]
     num_zones = len(bin_array) - 1
@@ -78,13 +78,13 @@ def heart_rate_bin_counts(series_data, bin_array, labels):
 #region - Plots
 
 # Creates a pie chart, histogram of heart rate data amounts; broken down by zone; include user_id to save files properly
-def heart_rate_zone_plots(binned_counts, user_id=None):
+def heart_rate_zone_plots(binned_counts, activity_id, user_id=None):
     pie = px.pie(binned_counts, values='counts', labels='zones',names='zones', title='Heart Rate Zone Data')
     hist = px.histogram(binned_counts, x="zones", y="counts", hover_data=binned_counts.columns, title='Zone Distribution')
 
     if user_id:
-        pie.write_html(cwd + f'/scripts/static/charts/{user_id}_hr_pie.html')
-        hist.write_html(cwd + f'/scripts/static/charts/{user_id}_hr_hist.html')
+        pie.write_html(cwd + f'/scripts/static/charts/{user_id}_{activity_id}_hr_pie.html')
+        hist.write_html(cwd + f'/scripts/static/charts/{user_id}_{activity_id}_hr_hist.html')
     else:
         pie.write_html(cwd + '/scripts/static/charts/hr_pie.html')
         hist.write_html(cwd + '/scripts/static/charts/hr_hist.html')
@@ -93,7 +93,7 @@ def heart_rate_zone_plots(binned_counts, user_id=None):
     #return pie, hist
 
 # Creates a plot of heartrate data based on series data(either distance or time); include user_id to save files properly
-def heart_rate_data_plot(series_data, lap_data, user_id=None):
+def heart_rate_data_plot(series_data, lap_data, activity_id, user_id=None):
     fig = px.line(series_data, x="dt_series", y="hr_series", title='Heart Rate Data', color_discrete_sequence = ['red'])
 
     if series_data['series_type'][0] == 'distance':
@@ -120,7 +120,7 @@ def heart_rate_data_plot(series_data, lap_data, user_id=None):
             fig.add_vrect(x0=begin, x1=end, line_width=0, fillcolor=color, opacity=0.2, annotation_text=name)
 
     if user_id:
-        fig.write_html(cwd + f'/scripts/static/charts/{user_id}_hr_plot.html')
+        fig.write_html(cwd + f'/scripts/static/charts/{user_id}_{activity_id}_hr_plot.html')
     else:
         fig.write_html(cwd + '/scripts/static/charts/hr_plot.html')
 
@@ -128,7 +128,7 @@ def heart_rate_data_plot(series_data, lap_data, user_id=None):
     #return fig
 
 #Generates a table of lap activity data; include user_id to save files properly
-def activity_lap_data_table(lap_data, user_id=None):
+def activity_lap_data_table(lap_data, activity_id, user_id=None):
     tbl = go.Figure(data=[go.Table(
     header=dict(values=['name','distance', 'moving time', 'elevation gain', 'average speed', 'average heartrate', 'max heartrate'],
                 fill_color='paleturquoise',
@@ -139,10 +139,34 @@ def activity_lap_data_table(lap_data, user_id=None):
     ])
 
     if user_id:
-        tbl.write_html(cwd + f'/scripts/static/charts/{user_id}_lap_tbl.html')
+        tbl.write_html(cwd + f'/scripts/static/charts/{user_id}_{activity_id}_lap_tbl.html')
     else:
         tbl.write_html(cwd + '/scripts/static/charts/lap_tbl.html')
 
     return None
 #endregion - Plots
 ########## END PLOTS ##########
+
+
+########## DO ANALYSIS ##########
+# creates all plots/tables for an individual activity
+def do_activity_analysis(activity_id, user_id, bin_array):
+    
+    # Get data
+    hr_data = get_hr_data(activity_id)
+    lap_data = get_lap_data(activity_id)
+    labels = zones(bin_array)
+
+    # Manipulate/organize data
+    series_data = heart_rate_zones(hr_data, bin_array, labels)
+    binned_counts = heart_rate_bin_counts(series_data, bin_array, labels)
+
+    # Plots
+    heart_rate_zone_plots(binned_counts, activity_id, user_id)
+    heart_rate_data_plot(series_data, lap_data, activity_id, user_id)
+    activity_lap_data_table(lap_data, activity_id, user_id)
+
+    return None
+
+
+
