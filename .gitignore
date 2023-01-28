@@ -4,3 +4,6 @@ venv
 scripts/app_config.py
 scripts/__pycache__
 __pycache__
+data/
+scripts/data_exploration.ipynb
+scripts/static/charts

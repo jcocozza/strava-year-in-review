@@ -15,8 +15,10 @@
             <h1>Strava Links</h1>
             <p><a href="{{ url_for('get_approved') }}">Grant Access to Strava Data</a></p>
 
-            <p><a href="{{ url_for('loading') }}">Refresh strava data</a></p>
+            <p><a href="{{ url_for('loading', process='refresh_data', redirect='strava') }}">Refresh strava data</a></p>
             <p><a href="{{ url_for('ad_hoc') }}"> Query your strava data</a></p>
+            <p><a href="{{ url_for('loading', process='weekly_summary', redirect='weekly_summary') }}"> Weekly Data Summary</a></p>
+
 
             <h2>Year in Review</h2>
             <p><a href="{{ url_for('summarize') }}">See summary statistics</a></p>

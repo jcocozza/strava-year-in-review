@@ -51,9 +51,9 @@
 
         <script>
           function navigate() {
-            window.location.href = "{{ url_for('strava') }}";  // redirect when done!
+            window.location.href = "{{ redirect }}";  // redirect when done!
           }
-          fetch("{{ url_for('refresh_data') }}").then(navigate); // load the slow url then navigate
+          fetch("{{ process }}").then(navigate); // load the slow url then navigate
         </script>
 
     </head>
