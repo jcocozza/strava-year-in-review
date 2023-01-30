@@ -259,11 +259,12 @@ def ad_hoc():
 # VERY similar to ad_hoc except for the present week
 @app.route('/strava/weekly_summary')
 def weekly_summary():
-    ########## PARAMETERS ##########
+    ##### PARAMETERS #####
     bin_array = [0, 150, 160, 205]
     labels = single_activity_analysis.zones(bin_array)
     user_id = session['id']
-    ####### WEEK INFORMATION #######
+    athlete_id = sql_functions.get_athlete_id()
+    ##### WEEK INFORMATION #####
     today = pendulum.now()
     beginning = today.start_of('week')
     ending = today.end_of('week')
@@ -275,32 +276,16 @@ def weekly_summary():
 
     header = f'Summary for {week_start} to {week_end}'
 
-    ########## GETTING DATA ##########
-    athlete_id = sql_functions.get_athlete_id()
-    week_activity_data = weekly_report_functions.get_week_activity_data(week_tuple, athlete_id)
-    week_heartrate_data = weekly_report_functions.get_week_heartrate_data(week_activity_data, session['id'])
-    week_lap_data = weekly_report_functions.get_timeinterval_lap_data(week_activity_data, session['id'])
+    # Get Data, Do Analysis, Generate and Save Plots
+    act_table = weekly_report_functions.run_all(week_tuple, athlete_id, bin_array, labels, user_id)
 
-    ########## DATA ANALYSIS ##########
-    total_mileage = weekly_report_functions.total_distance(week_activity_data)
-    avg_mileage = weekly_report_functions.average_distance(week_activity_data, 7)
-    total_time = weekly_report_functions.total_time(week_activity_data)
-    avg_time = weekly_report_functions.average_time(week_activity_data, 7)
-
-    activity_table = weekly_report_functions.activity_table(week_activity_data)
-    binned_zone_data = weekly_report_functions.zone_data(week_heartrate_data, bin_array, labels)
-
-    ########## PLOTS ##########
-    hr_plot = weekly_report_functions.heart_rate_zone_plots(binned_zone_data, user_id)
-    mileage = weekly_report_functions.mileage_graph(week_activity_data, user_id)
-    time = weekly_report_functions.time_graph(week_activity_data, user_id)
-
+    #### urls for plots/graphs
     src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html')
     src2 = url_for('static', filename=f'charts/{user_id}_weekly_hr_hist.html')
     src3 = url_for('static', filename=f'charts/{user_id}_weekly_mileage_bar.html')
     src4 = url_for('static', filename=f'charts/{user_id}_weekly_time_bar.html')
 
-    return render_template('weekly_summary.html', header=header, activity_table=Markup(activity_table), src1=src1, src2=src2, src3=src3, src4=src4)
+    return render_template('weekly_summary.html', header=header, activity_table=Markup(act_table), src1=src1, src2=src2, src3=src3, src4=src4)
 
 # An analysis of an individual activity; will come with ?activity_id=XXXXXXXX in url for the GET method
 @app.route('/strava/weekly_summary/activity_analysis', methods=['GET'])

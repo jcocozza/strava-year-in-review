@@ -5,7 +5,10 @@ from strava_api_throttle import call_api
 import pandas as pd
 import os
 import requests
+import sql_functions
+import sqlalchemy
 #endregion - imports
+########## END IMPORTS ##########
 
 # A quick overview of how this works:
 # The developer needs to create an application through strava
@@ -31,6 +34,9 @@ activites_url = "https://www.strava.com/api/v3/athlete/activities"
 client_id = app_config.client_id
 client_secret = app_config.client_secret
 
+
+########## TOKENS ##########
+#region - tokens
 # Used for first time users to get a refresh token and access token
 def create_payload_auth(client_id, client_secret, authorization_code):
     payload_info = {
@@ -93,13 +99,21 @@ def returning_user_access_token(refresh_token):
     access_token = get_user_access_token_from_refresh_token(payload)
     return access_token
 
-# Gets activity data for a user given their access token
-def get_user_activity_data(access_token, user_id=None):
+#endregion - tokens
+########## END TOKENS ##########
+
+########## GETTING DATA ##########
+#region - Data From Strava to MySQL
+
+##### Activity Data #####
+#region - Activity Data
+# Gets activity data for a user given their access token; saves to csv
+def get_user_activity_data(access_token, user_id=None):#, pages_to_pull=None,):
     page = 1
     activities = pd.DataFrame()
     print("Pulling Data...")
     try:
-        while page <= 3:
+        while page <= 3: # let this be dynamic to minimize calls to api
             param={'per_page': 200, 'page': page}
             data_set = call_api(url=activites_url, access_token=access_token, parameter=param).json()
 
@@ -115,20 +129,25 @@ def get_user_activity_data(access_token, user_id=None):
         exit(1)
     else:
         if user_id:
-            activities.to_csv(cwd + '/data/' + str(user_id) + '_data.csv')
+            file_path = cwd + '/data/' + str(user_id) + '_data.csv'
+            activities.to_csv(file_path) # save data to a csv
+            sql_functions.upload_data_file_to_local(file_path, 'strava_app_activity_data') # upload csv to MySQL
         else:
-            # save data to a csv
-            activities.to_csv(cwd + '/data/data.csv')
-
+            activities.to_csv(cwd + '/data/data.csv') # save data to a csv
         return activities
 
+#endregion - Activity Data
+##### End Activity Data #####
+
+##### HeartRate Data #####
+#region - heartrate data
 # Heartrate url for interacting with Strava API to get heartrate streams
 def create_hr_url(activity_id):
     hr_url = "https://www.strava.com/api/v3/activities/%s/streams?keys=heartrate&key_by_type=" % (activity_id, )
     return hr_url
 
-# Gets heart rate data for a given activity
-def get_heart_rate_activity_data(activity_id, access_token, user_id=None):
+# Get 1 activity's worth of heartrate data (per strava policy, can only pull 1 Stream worth of data per API call)
+def get_heart_rate_activity_data(activity_id, access_token):
     try:
         hr_url = create_hr_url(activity_id)
         hr_data = call_api(url=hr_url, access_token=access_token).json()
@@ -140,13 +159,40 @@ def get_heart_rate_activity_data(activity_id, access_token, user_id=None):
     else:
         return hr_dataframe
 
+# Given some activity data pull the heart rate data for those activities
+# Pulls from strava; saves to csv; uploads to MySQL
+def get_heartrate_data_for_activities(activity_data, user_id):
+    activity_id_list = activity_data['id']
+    refresh_token = sql_functions.get_refresh_token(user_id=user_id)
+    access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
+
+    hr_data_frame = pd.DataFrame()
+    for act in activity_id_list:
+        temp_hr_df = get_user_activity_data.get_heart_rate_activity_data(activity_id=act,access_token=access_token, user_id=user_id)
+        hr_data_frame = pd.concat([hr_data_frame, temp_hr_df])
+    
+    file_path = cwd + '/data/' + str(user_id) + '_hr_data.csv'
+
+    hr_data_frame.to_csv(file_path) # save dataframe to csv
+
+    metadata={
+        "data":sqlalchemy.dialects.mysql.LONGTEXT(),
+        "type":sqlalchemy.dialects.mysql.VARCHAR(225)}
+    sql_functions.upload_data_file_to_local(file_path, 'heartrate_data', metadata) # upload csv to MySQL
+    return hr_data_frame
+
+#endregion - heartrate data
+##### End HeartRate Data #####
+
+##### Lap Data #####
+#region - lap data
 # Lap url for interacting with Strava API to get lap streams
 def create_lap_url(activity_id):
     hr_url = "https://www.strava.com/api/v3/activities/%s/laps" % (activity_id, )
     return hr_url
 
 # Gets Laps for an individual activity; specifiy user_id to save file properly
-def get_activity_laps(activity_id, access_token, user_id=None):
+def get_activity_laps(activity_id, access_token):
     try:
         lap_url = create_lap_url(activity_id)
         lap_data = call_api(url=lap_url, access_token=access_token).json()
@@ -157,4 +203,46 @@ def get_activity_laps(activity_id, access_token, user_id=None):
         exit(1)
     else:
         return lap_dataframe
+
+# Given some activity data pull the heart rate data for those activities
+# Pulls from strava; saves to csv; uploads to MySQL
+def get_lap_data_for_activities(activity_data, user_id):
+    activity_id_list = activity_data['id']
+    refresh_token = sql_functions.get_refresh_token(user_id=user_id)
+    access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
+
+    lap_data_frame = pd.DataFrame()
+    for act in activity_id_list:
+        temp_lap_df = get_user_activity_data.get_activity_laps(activity_id=act,access_token=access_token, user_id=user_id)
+        lap_data_frame = pd.concat([lap_data_frame, temp_lap_df])
+
+    file_path = cwd + '/data/' + str(user_id) + '_hr_data.csv'
+
+    lap_data_frame.to_csv(file_path)
+
+    metadata={
+        "data":sqlalchemy.dialects.mysql.LONGTEXT(),
+        "type":sqlalchemy.dialects.mysql.VARCHAR(225)}
+    sql_functions.upload_data_file_to_local(file_path, 'lap_data', metadata)
+
+    return lap_data_frame
+
+#endregion - lap data
+##### End Lap Data #####
+
+##### Activity List Wrapper #####
+#region - meta function
+
+# handles both heartrate data and lap data for a given set of activities
+# STRAVA -> CSV -> MySQL
+# Saves data to csv and uploads to MySQL
+def api_to_mysql_heartrate_lap_data(activity_data, user_id):
+    hr_data = get_heartrate_data_for_activities(activity_data, user_id)
+    lap_data = get_lap_data_for_activities(activity_data, user_id)
+    return None
+
+#endregion - meta function
+
+#endregion - Data From Strava to MySQL
+########## END GETTING DATA ##########
 
