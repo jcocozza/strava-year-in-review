@@ -45,13 +45,13 @@ def get_week_activity_data(beginning_end, athlete_id):
 # Pulls FROM strava and uploads to MySQL database
 def get_week_heartrate_data(week_data):
     activity_id_list = week_data['id']
-    
+
     t = tuple(activity_id_list)
     #sql = "SELECT * FROM heartrate_data WHERE `activity_id` IN {}".format(t)
 
     sql = """SELECT hrd.activity_id, saad.`type` AS activity_type, hrd.`type` AS stream_type, hrd.series_type, hrd.`data`
     FROM heartrate_data hrd
-    INNER JOIN strava_app_activity_data saad 
+    INNER JOIN strava_app_activity_data saad
     ON saad.id = hrd.activity_id
     WHERE hrd.activity_id IN {}""".format(t)
 
@@ -96,7 +96,7 @@ def generate_link(activity_id):
     link = f'https://jcocozza.pythonanywhere.com/strava/weekly_summary/activity_analysis?id={activity_id}'
     return link
 
-# returns amount spend in each zone 
+# returns amount spend in each zone
 # This function will likely be depreciated very soon
 def zone_data(heartrate_data, bin_array, labels):
     hr_array = []
@@ -125,18 +125,24 @@ def zone_data(heartrate_data, bin_array, labels):
 def explode_hr_data(heartrate_data, bin_array, labels):
     explode_hr_data = heartrate_data.explode('data')
 
-    exploded = explode_hr_data.loc[explode_hr_data['type'] == 'heartrate'] # only bother with the heartrate data stream
+    print('########## DEBUGGING ##########')
+
+    print(explode_hr_data)
+
+    print('########## END DEBUGGING ##########')
+
+    exploded = explode_hr_data.loc[explode_hr_data['stream_type'] == 'heartrate'] # only bother with the heartrate data stream
     exploded['zone'] = pd.cut(exploded['data'], bins=bin_array, labels=labels) # set zones for each heart rate value
     return exploded
 
-# bin data by hr_bins, if specified can returned data for a given activity_type 
+# bin data by hr_bins, if specified can returned data for a given activity_type
 def bin_data(exploded_hr_data, bin_array, labels, activity_type=None):
-    if activity_type: 
-        df = exploded_hr_data.loc[exploded_hr_data['activity_type'] == activity_type] # 
+    if activity_type:
+        df = exploded_hr_data.loc[exploded_hr_data['activity_type'] == activity_type] #
         counts = pd.cut(df['data'], bins=bin_array, labels=labels).value_counts().sort_index()
         binned_counts = pd.DataFrame({'zones':counts.index, 'counts':counts}).reset_index(drop=True)
         return binned_counts
-    else: 
+    else:
         counts = pd.cut(exploded_hr_data['data'], bins=bin_array, labels=labels).value_counts().sort_index()
         binned_counts = pd.DataFrame({'zones':counts.index, 'counts':counts}).reset_index(drop=True)
         return binned_counts
@@ -156,13 +162,13 @@ def heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id=None):
         {
             'method':'restyle',
             'label':'All',
-            'args':[{'values': [bin_data(exploded_hr_data)['counts']]},]
+            'args':[{'values': [bin_data(exploded_hr_data, bin_array, labels)['counts']]},]
         }]
     for activity_type in exploded_hr_data['activity_type'].unique():
         b = {
                 'method':'restyle',
                 'label':activity_type,
-                'args':[{'values': [bin_data(exploded_hr_data, activity_type)['counts']]},]
+                'args':[{'values': [bin_data(exploded_hr_data, bin_array, labels, activity_type=activity_type)['counts']]},]
             }
         buttons.append(b)
     update_menus.append({'buttons':buttons})
@@ -193,13 +199,13 @@ def time_graph(activity_data, user_id=None):
     fig = px.bar(activity_data, x='start_date_local', y='moving_time', color='type')
     if user_id:
         fig.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_time_bar.html')
-    else: 
+    else:
         fig.write_html(cwd + '/scripts/static/charts/weekly_time_bar.html')
     return None
 
 def activity_table(activity_data):
     #tbl = activity_data[['name', 'distance', 'moving_time', 'total_elevation_gain', 'type', 'average_speed', 'average_heartrate']]
-    
+
     html =  """<table>
                 <tr>
                     <th>name</th>
@@ -226,7 +232,7 @@ def activity_table(activity_data):
                          <td>{avg_hr}</td>
                         </tr>"""
     html += """</table>"""
-    
+
     return html #tbl.to_html()
 
 #endregion
@@ -256,7 +262,7 @@ def run_all(week_tuple, athlete_id, bin_array, labels, user_id):
     exploded_hr_data = explode_hr_data(week_heartrate_data, bin_array, labels)
 
     ########## PLOTS ##########
-    hr_plots = heart_rate_zone_plots(exploded_hr_data, user_id)
+    hr_plots = heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id)
     mileage = mileage_graph(week_activity_data, user_id)
     time = time_graph(week_activity_data, user_id)
 
