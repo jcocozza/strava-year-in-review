@@ -170,11 +170,11 @@ def get_heartrate_data_for_activities(activity_data, user_id):
         return None
 
     refresh_token = sql_functions.get_refresh_token(user_id=user_id)
-    access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
+    access_token = returning_user_access_token(refresh_token) # getting access token
 
     hr_data_frame = pd.DataFrame()
     for act in activity_id_list:
-        temp_hr_df = get_user_activity_data.get_heart_rate_activity_data(activity_id=act,access_token=access_token, user_id=user_id)
+        temp_hr_df = get_heart_rate_activity_data(activity_id=act,access_token=access_token, user_id=user_id)
         hr_data_frame = pd.concat([hr_data_frame, temp_hr_df])
     
     file_path = cwd + '/data/' + str(user_id) + '_hr_data.csv'
@@ -220,11 +220,11 @@ def get_lap_data_for_activities(activity_data, user_id):
         return None
 
     refresh_token = sql_functions.get_refresh_token(user_id=user_id)
-    access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
+    access_token = returning_user_access_token(refresh_token) # getting access token
 
     lap_data_frame = pd.DataFrame()
     for act in activity_id_list:
-        temp_lap_df = get_user_activity_data.get_activity_laps(activity_id=act,access_token=access_token, user_id=user_id)
+        temp_lap_df = get_activity_laps(activity_id=act,access_token=access_token, user_id=user_id)
         lap_data_frame = pd.concat([lap_data_frame, temp_lap_df])
 
     file_path = cwd + '/data/' + str(user_id) + '_hr_data.csv'
@@ -256,7 +256,7 @@ def api_to_mysql_heartrate_lap_data(activity_data, user_id):
 # pulls the latest Strava activity and saves to MySQL
 def refresh_activity_data(user_id):
     refresh_token = sql_functions.get_refresh_token()
-    access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
+    access_token = returning_user_access_token(refresh_token) # getting access token
     data = get_user_activity_data(access_token, user_id, pages_to_pull=1)
     return None
 
