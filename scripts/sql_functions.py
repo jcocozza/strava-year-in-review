@@ -76,7 +76,7 @@ def get_athlete_id():
     sql = "SELECT athlete_id FROM users WHERE user_id = %s" % (session['id'],)
     id = local_sql_to_df(sql)['athlete_id'][0]
     return id
-
+'''
 # check if an activity is in a table 
 # returns true if the activity_id is in the table
 # otherwise returns false
@@ -92,6 +92,19 @@ def activity_id_not_in_list(activity_list, tbl):
         if not check_if_in(activity, tbl):
             not_in_activity_list.append(activity)
     return not_in_activity_list
+'''
+def activity_id_not_in_list(activity_list):
+    sql = """SELECT saad.id
+                FROM strava_app_activity_data saad
+                LEFT JOIN heartrate_data hrd
+                ON saad.id = hrd.activity_id
+                WHERE hrd.activity_id IS NULL;"""
+
+    li = local_sql_to_df(sql)['id'] # get data in activity table, but not in hr table
+    
+    not_in_activity_list = list(set(activity_list) & set(li)) # get the data NOT in hr table and that we want to pull
+    return not_in_activity_list
+
 
 # gets a users refresh token
 def get_refresh_token(user_id=None):
