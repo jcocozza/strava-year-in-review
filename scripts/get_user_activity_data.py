@@ -162,7 +162,12 @@ def get_heart_rate_activity_data(activity_id, access_token):
 # Given some activity data pull the heart rate data for those activities
 # Pulls from strava; saves to csv; uploads to MySQL
 def get_heartrate_data_for_activities(activity_data, user_id):
-    activity_id_list = activity_data['id']
+    activity_id_list = activity_data['id'] #list of activities that we need HR data for
+    activity_id_list = sql_functions.activity_id_not_in_list(activity_id_list, 'heartrate_data') #list of activities that we don't have HR data for yet
+
+    if not activity_id_list: #if there are no activities we don't have HR data for, then there's nothing else we need to do here
+        return None
+
     refresh_token = sql_functions.get_refresh_token(user_id=user_id)
     access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
 
@@ -207,7 +212,12 @@ def get_activity_laps(activity_id, access_token):
 # Given some activity data pull the heart rate data for those activities
 # Pulls from strava; saves to csv; uploads to MySQL
 def get_lap_data_for_activities(activity_data, user_id):
-    activity_id_list = activity_data['id']
+    activity_id_list = activity_data['id'] #list of activities that we need lap data for
+    activity_id_list = sql_functions.activity_id_not_in_list(activity_id_list, 'heartrate_data') #list of activities that we don't have lap data for yet
+
+    if not activity_id_list: #if there are no activities we don't have lap data for, then there's nothing else we need to do here
+        return None
+
     refresh_token = sql_functions.get_refresh_token(user_id=user_id)
     access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
 
