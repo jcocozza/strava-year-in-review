@@ -41,6 +41,7 @@ def engine_connection(engine_string):
 
 # Using SQLAlchemy built in features rather than converting to a dataframe
 def query_database(query):
+    print(f'Querying SQL Data for Query: {query}')
     string = generate_engine_string(app_config.db_user, app_config.db_password, app_config.db_host, app_config.db_name)
     connection = engine_connection(string)
 
@@ -71,6 +72,7 @@ def insert_athlete_id(athlete_id):
 
 # returns athlete_id stored in user table based on what user is logged in
 def get_athlete_id():
+    print('Getting athlete_id')
     sql = "SELECT athlete_id FROM users WHERE user_id = %s" % (session['id'],)
     id = local_sql_to_df(sql)['athlete_id'][0]
     return id
@@ -148,7 +150,7 @@ def local_sql_to_df(query, parse_dates=None):
     string = generate_engine_string(app_config.db_user, app_config.db_password, app_config.db_host, app_config.db_name)
     connection = engine_connection(string)
 
-    print('Querying SQL Data...')
+    print(f'Querying SQL Data for Query: {query}')
     try:
         df = pd.read_sql(query, con=connection, parse_dates=parse_dates)
     except Exception as ex:
