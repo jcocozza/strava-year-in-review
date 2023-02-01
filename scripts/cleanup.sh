@@ -21,8 +21,19 @@ fi
 
 do_log "********** Starting Cleaning **********"
 do_log "cleaning data..."
+if [ -n "$(ls -A ${OPWD}/data 2>/dev/null)" ]
+then
 do_command "rm -rv ${OPWD}/data/*"
+else
+    do_log "data folder clean"
+fi
+
 do_log "cleaning charts..."
+if [ -n "$(ls -A ${OPWD}/scrips/static/charts 2>/dev/null)" ]
+then
 do_command "rm -rv ${OPWD}/scrips/static/charts/*"
+else
+    do_log "charts folder clean"
+fi
 do_log "********** Cleaning Done **********"
 
