@@ -10,7 +10,9 @@ import os
 import sqlalchemy
 import app_config
 import plotly.express as px
+from flask import url_for
 #endregion - imports
+########## END IMPORTS ##########
 
 # General Overview of Process:
 # 0) Refresh Strava Data
@@ -29,7 +31,7 @@ cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
 cwd = repo_dir
 
-########## GET DATA ##########
+########## GET DATA - From MySQL ##########
 #region - Get Data
 
 # Gets data between a time interval tuple, beginning_end
@@ -42,63 +44,38 @@ def get_week_activity_data(beginning_end, athlete_id):
 
 # Given some activity data pull the heart rate data for those activities
 # Pulls FROM strava and uploads to MySQL database
-def get_week_heartrate_data(week_data, user_id):
-    # Step 2a
+def get_week_heartrate_data(week_data):
     activity_id_list = week_data['id']
-    refresh_token = sql_functions.get_refresh_token(user_id=user_id)
-    access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
 
-    # Step 2b
-    # need to append activity id to this dataframe
-    hr_data_frame = pd.DataFrame()
-    for act in activity_id_list:
-        temp_hr_df = get_user_activity_data.get_heart_rate_activity_data(activity_id=act,access_token=access_token, user_id=user_id)
-        hr_data_frame = pd.concat([hr_data_frame, temp_hr_df])
-
-    hr_data_frame.to_csv(cwd + '/data/' + str(user_id) + '_hr_data.csv')
-
-    file_path = cwd + '/data/' + str(user_id) + '_hr_data.csv'
-    metadata={
-        "data":sqlalchemy.dialects.mysql.LONGTEXT(),
-        "type":sqlalchemy.dialects.mysql.VARCHAR(225)}
-    sql_functions.upload_data_file_to_local(file_path, 'heartrate_data', metadata)
-
-    # Step 2c
-    heartrate_data = pd.DataFrame()
     t = tuple(activity_id_list)
-    sql = "SELECT * FROM heartrate_data WHERE `activity_id` IN {}".format(t)
+    #sql = "SELECT * FROM heartrate_data WHERE `activity_id` IN {}".format(t)
+
+    sql = """SELECT hrd.activity_id, saad.`type` AS activity_type, hrd.`type` AS stream_type, hrd.series_type, hrd.`data`
+    FROM heartrate_data hrd
+    INNER JOIN strava_app_activity_data saad
+    ON saad.id = hrd.activity_id
+    WHERE hrd.activity_id IN {}""".format(t)
+
     heartrate_data = sql_functions.local_sql_to_df(sql)
+
+    # interpret literally:
+    heartrate_data['data'] = [literal_eval(x) for x in heartrate_data['data']]
+
     return heartrate_data
 
-def get_timeinterval_lap_data(week_data, user_id):
+def get_timeinterval_lap_data(week_data):
     activity_id_list = week_data['id']
-    refresh_token = sql_functions.get_refresh_token(user_id=user_id)
-    access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
 
-    lap_data_frame = pd.DataFrame()
-    for act in activity_id_list:
-        temp_lap_df = get_user_activity_data.get_activity_laps(activity_id=act,access_token=access_token, user_id=user_id)
-        lap_data_frame = pd.concat([lap_data_frame, temp_lap_df])
-
-    lap_data_frame.to_csv(cwd + '/data/' + str(user_id) + '_hr_data.csv')
-
-    file_path = cwd + '/data/' + str(user_id) + '_hr_data.csv'
-    metadata={
-        "data":sqlalchemy.dialects.mysql.LONGTEXT(),
-        "type":sqlalchemy.dialects.mysql.VARCHAR(225)}
-    sql_functions.upload_data_file_to_local(file_path, 'lap_data', metadata)
-
-    lap_data = pd.DataFrame()
     t = tuple(activity_id_list)
     sql = "SELECT * FROM lap_data WHERE `activity_id` IN {}".format(t)
     lap_data = sql_functions.local_sql_to_df(sql)
     return lap_data
 
 #endregion
-########## END GET DATA ##########
+########## END GET DATA - From MySQL ##########
 
 ########## DATA ANALYSIS ##########
-#region
+#region - data analysis
 
 # Total distance in a given set of activities
 def total_distance(activity_data):
@@ -111,23 +88,33 @@ def average_distance(activity_data, time_interval):
 def total_time(activity_data):
     return sum(activity_data['moving_time'])
 # Average time in a given set of activities over a given time period
-def average_time(activity_data, time_interval)    :
+def average_time(activity_data, time_interval):
     return total_time(activity_data)/time_interval
 
+# will return a link for a given activity_id
 def generate_link(activity_id):
+    #link = url_for('activity_analysis', id=activity_id) -- try this in the future so we don't have to hard code anything
     link = f'https://jcocozza.pythonanywhere.com/strava/weekly_summary/activity_analysis?id={activity_id}'
     return link
 
+# returns amount spend in each zone
+# This function will likely be depreciated very soon
 def zone_data(heartrate_data, bin_array, labels):
     hr_array = []
-    dt_array = []
+
+    if heartrate_data['series_type'][0] == 'distance':
+        for row in heartrate_data:
+            hr_array = hr_array + literal_eval(heartrate_data['data'][1])
+    if heartrate_data['series_type'][0] == 'time':
+        for row in heartrate_data:
+            hr_array = hr_array + literal_eval(heartrate_data['data'][0])
+    '''
     for row in heartrate_data:
         if heartrate_data['series_type'][0] == 'distance':
             hr_array = hr_array + literal_eval(heartrate_data['data'][1])
         if heartrate_data['series_type'][0] == 'time':
             hr_array = hr_array + literal_eval(heartrate_data['data'][0])
-
-    #hr_df = pd.DataFrame(hr_array, columns=['hr_series']) # NEED TO FIX THIS-- pandas is trying to make each elm in array as a column instead of 1 col
+    '''
     hr_df = pd.DataFrame({'hr_series': hr_array})
 
     count = pd.cut(hr_df['hr_series'], bins=bin_array, labels=labels).value_counts().sort_index()
@@ -135,14 +122,56 @@ def zone_data(heartrate_data, bin_array, labels):
 
     return binned_counts
 
-#endregion
+# expand heartrate data so that each element of an array of HR data has its own row (yes, this creates a ton of rows)
+def explode_hr_data(heartrate_data, bin_array, labels):
+    explode_hr_data = heartrate_data.explode('data')
+
+    exploded = explode_hr_data.loc[explode_hr_data['stream_type'] == 'heartrate'] # only bother with the heartrate data stream
+    exploded['zone'] = pd.cut(exploded['data'], bins=bin_array, labels=labels) # set zones for each heart rate value
+    return exploded
+
+# bin data by hr_bins, if specified can returned data for a given activity_type
+def bin_data(exploded_hr_data, bin_array, labels, activity_type=None):
+    if activity_type:
+        df = exploded_hr_data.loc[exploded_hr_data['activity_type'] == activity_type] #
+        counts = pd.cut(df['data'], bins=bin_array, labels=labels).value_counts().sort_index()
+        binned_counts = pd.DataFrame({'zones':counts.index, 'counts':counts}).reset_index(drop=True)
+        return binned_counts
+    else:
+        counts = pd.cut(exploded_hr_data['data'], bins=bin_array, labels=labels).value_counts().sort_index()
+        binned_counts = pd.DataFrame({'zones':counts.index, 'counts':counts}).reset_index(drop=True)
+        return binned_counts
+
+#endregion - data analysis
 ########## END DATA ANALYSIS ##########
 
 ########## PLOTS ##########
 #region
-def heart_rate_zone_plots(binned_counts, user_id=None):
-    pie = px.pie(binned_counts, values='counts', labels='zones',names='zones', title='Heart Rate Zone Data')
-    hist = px.histogram(binned_counts, x="zones", y="counts", hover_data=binned_counts.columns, title='Zone Distribution')
+def heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id=None):
+
+    total_bin = bin_data(exploded_hr_data, bin_array, labels)
+    pie = px.pie(total_bin, values='counts', labels='zones',names='zones', title='Heart Rate Zone Data')
+
+    update_menus = []
+    buttons = [
+        {
+            'method':'restyle',
+            'label':'All',
+            'args':[{'values': [bin_data(exploded_hr_data, bin_array, labels)['counts']]},]
+        }]
+    for activity_type in exploded_hr_data['activity_type'].unique():
+        b = {
+                'method':'restyle',
+                'label':activity_type,
+                'args':[{'values': [bin_data(exploded_hr_data, bin_array, labels, activity_type=activity_type)['counts']]},]
+            }
+        buttons.append(b)
+    update_menus.append({'buttons':buttons})
+
+    pie.update_layout(updatemenus=update_menus)
+
+
+    hist = px.histogram(total_bin, x="zones", y="counts", hover_data=total_bin.columns, title='Zone Distribution')
 
     if user_id:
         pie.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_hr_pie.html')
@@ -165,13 +194,13 @@ def time_graph(activity_data, user_id=None):
     fig = px.bar(activity_data, x='start_date_local', y='moving_time', color='type')
     if user_id:
         fig.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_time_bar.html')
-    else: 
+    else:
         fig.write_html(cwd + '/scripts/static/charts/weekly_time_bar.html')
     return None
 
 def activity_table(activity_data):
     #tbl = activity_data[['name', 'distance', 'moving_time', 'total_elevation_gain', 'type', 'average_speed', 'average_heartrate']]
-    
+
     html =  """<table>
                 <tr>
                     <th>name</th>
@@ -198,29 +227,43 @@ def activity_table(activity_data):
                          <td>{avg_hr}</td>
                         </tr>"""
     html += """</table>"""
-    
+
     return html #tbl.to_html()
 
 #endregion
 ########## END PLOTS ##########
 
+########## MAIN ##########
+#region - main
 
-# Amalgamation
-def main():
-    #flask_app.refresh_data()
+def run_all(week_tuple, athlete_id, bin_array, labels, user_id):
+    ########## GETTING ACTIVITY DATA ##########
+    week_activity_data = get_week_activity_data(week_tuple, athlete_id)
 
-    # get_previous_week()
-    alpha_omega = ('2022-11-28', '2022-12-04') # Nov 28 - Dec 4
-    week_act_data = get_week_activity_data(alpha_omega, app_config.athlete_id)
-    weekly_hr_data = get_week_heartrate_data(week_act_data, app_config.user_id)
-    weekly_lap_data = get_timeinterval_lap_data(week_act_data,app_config.user_id)
+    if week_activity_data.empty: # If there is no data in the time frame then there is nothing we can do. 
+        return 'There are no detected activites for this week. Consider refreshing strava data if you think this is a mistake.'
 
-    # temporary to test stuff
-    return weekly_lap_data
+    ########## Make sure MySQL DB is up to date for HR and lap data ##########
+    get_user_activity_data.api_to_mysql_heartrate_lap_data(week_activity_data, user_id)
 
-if __name__ == '__main__':
-    data = main()
+    ########## GETTING LAP/HR DATA ##########
+    week_heartrate_data = get_week_heartrate_data(week_activity_data)
+    week_lap_data = get_timeinterval_lap_data(week_activity_data)
 
+    ########## DATA ANALYSIS ##########
+    total_mileage = total_distance(week_activity_data)
+    avg_mileage = average_distance(week_activity_data, 7)
+    tot_time = total_time(week_activity_data)
+    avg_time = average_time(week_activity_data, 7)
 
+    act_table = activity_table(week_activity_data)
+    exploded_hr_data = explode_hr_data(week_heartrate_data, bin_array, labels)
 
+    ########## PLOTS ##########
+    hr_plots = heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id)
+    mileage = mileage_graph(week_activity_data, user_id)
+    time = time_graph(week_activity_data, user_id)
 
+    return act_table
+#endregion - main
+########## END MAIN ##########
