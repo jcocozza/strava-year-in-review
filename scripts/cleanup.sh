@@ -1,7 +1,7 @@
 #!/bin/bash
 # Quick script to clean up file system
 
-OPWD=$(cd $(dirname $0);pwd)
+OPWD=$(cd $(dirname $0)/..;pwd)
 
 # log message to stdout
 do_log () {
@@ -19,21 +19,20 @@ if [ $error_code -ne 0 ]; then
 fi
 }
 
+function cleanFolder(){
+  if [ "$(ls -A $1)" ]; then
+    do_command "rm -rv $1"
+  else 
+    echo "$1 is empty"
+  fi
+}
+
 do_log "********** Starting Cleaning **********"
 do_log "cleaning data..."
-if [ -n "$(ls -A ${OPWD}/data 2>/dev/null)" ]
-then
-do_command "rm -rv ${OPWD}/data/*"
-else
-    do_log "data folder clean"
-fi
+cleanFolder "${OPWD}/data/*"
 
 do_log "cleaning charts..."
-if [ -n "$(ls -A ${OPWD}/scrips/static/charts 2>/dev/null)" ]
-then
-do_command "rm -rv ${OPWD}/scrips/static/charts/*"
-else
-    do_log "charts folder clean"
-fi
+cleanFolder "${OPWD}/scripts/static/charts/*"
+
 do_log "********** Cleaning Done **********"
 
