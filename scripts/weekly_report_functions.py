@@ -240,7 +240,7 @@ def run_all(week_tuple, athlete_id, bin_array, labels, user_id):
     ########## GETTING ACTIVITY DATA ##########
     week_activity_data = get_week_activity_data(week_tuple, athlete_id)
 
-    if not week_activity_data: # If there is no data in the time frame then there is nothing we can do. 
+    if week_activity_data.empty: # If there is no data in the time frame then there is nothing we can do. 
         return None
 
     ########## Make sure MySQL DB is up to date for HR and lap data ##########
