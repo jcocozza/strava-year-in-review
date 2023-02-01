@@ -108,12 +108,13 @@ def returning_user_access_token(refresh_token):
 ##### Activity Data #####
 #region - Activity Data
 # Gets activity data for a user given their access token; saves to csv
-def get_user_activity_data(access_token, user_id=None):#, pages_to_pull=None,):
+# Pull at most pages_to_pull; Should be min of 1
+def get_user_activity_data(access_token, user_id=None, pages_to_pull=None):
     page = 1
     activities = pd.DataFrame()
     print("Pulling Data...")
     try:
-        while page <= 3: # let this be dynamic to minimize calls to api
+        while page <= pages_to_pull: # dynamic to minimize calls to api
             param={'per_page': 200, 'page': page}
             data_set = call_api(url=activites_url, access_token=access_token, parameter=param).json()
 
@@ -240,18 +241,27 @@ def get_lap_data_for_activities(activity_data, user_id):
 #endregion - lap data
 ##### End Lap Data #####
 
-##### Activity List Wrapper #####
+##### Activity List Wrappers #####
 #region - meta function
 
 # handles both heartrate data and lap data for a given set of activities
 # STRAVA -> CSV -> MySQL
 # Saves data to csv and uploads to MySQL
+# will not call API for data already in the database
 def api_to_mysql_heartrate_lap_data(activity_data, user_id):
     hr_data = get_heartrate_data_for_activities(activity_data, user_id)
     lap_data = get_lap_data_for_activities(activity_data, user_id)
     return None
 
+# pulls the latest Strava activity and saves to MySQL
+def refresh_activity_data(user_id):
+    refresh_token = sql_functions.get_refresh_token()
+    access_token = get_user_activity_data.returning_user_access_token(refresh_token) # getting access token
+    data = get_user_activity_data(access_token, user_id, pages_to_pull=1)
+    return None
+
 #endregion - meta function
+##### END Activity List Wrappers #####
 
 #endregion - Data From Strava to MySQL
 ########## END GETTING DATA ##########

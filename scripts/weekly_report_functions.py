@@ -236,8 +236,13 @@ def activity_table(activity_data):
 #region - main
 
 def run_all(week_tuple, athlete_id, bin_array, labels, user_id):
-    ########## GETTING DATA ##########
+    ########## GETTING ACTIVITY DATA ##########
     week_activity_data = get_week_activity_data(week_tuple, athlete_id)
+
+    ########## Make sure MySQL DB is up to date for HR and lap data ##########
+    get_user_activity_data.api_to_mysql_heartrate_lap_data(week_activity_data, user_id)
+
+    ########## GETTING LAP/HR DATA ##########
     week_heartrate_data = get_week_heartrate_data(week_activity_data)
     week_lap_data = get_timeinterval_lap_data(week_activity_data)
 
@@ -256,6 +261,5 @@ def run_all(week_tuple, athlete_id, bin_array, labels, user_id):
     time = time_graph(week_activity_data, user_id)
 
     return act_table
-
 #endregion - main
 ########## END MAIN ##########

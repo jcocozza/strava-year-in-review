@@ -5,7 +5,10 @@ import requests
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 #endregion - imports
+########## END IMPORTS ##########
 
+########## THROTTLE ##########
+#region - Throttle
 # This handles GET calls to the Strava API to get data
 # Uses the wrapper to limit calls 
 
@@ -21,3 +24,5 @@ def call_api(url, access_token, parameter=None):
         if response.status_code != 200:
             raise Exception('API responese: {}'.format(response.status_code))
         return response
+#endregion - Throttle
+########## END THROTTLE ##########
