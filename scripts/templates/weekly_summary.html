@@ -7,10 +7,12 @@
    <body>
       {% extends "navigation.html" %}
       {% block content %}
+
+      {% if activity_table %}
       <!-- Page content -->
       <h1> {{ header }} </h1>
       <h2> Activites for the week </h2>
-      <p> {{ activity_table}} </p>
+      <p> {{ activity_table }} </p>
 
       <h2> Week Summary Graphs</h2>
 
@@ -19,14 +21,10 @@
       <iframe src="{{ src3 }}" seamless width=1000, height=600></iframe>
       <iframe src="{{ src4 }}" seamless width=1000, height=600></iframe>
 
-      <!--
-      <iframe src= "{{ url_for('static', filename='charts/weekly_hr_pie.html') }}" seamless width=1000, height=600></iframe>
-      <iframe src="{{ url_for('static', filename='charts/weekly_hr_hist.html') }}" seamless width=1000, height=600></iframe>
-      <iframe src="{{ url_for('static', filename='charts/weekly_mileage_bar.html') }}" seamless width=1000, height=600></iframe>
-      <iframe src="{{ url_for('static', filename='charts/weekly_time_bar.html') }}" seamless width=1000, height=600></iframe>
-      -->
-
-
+      {% else %}
+      <h1> No Activites for this week </h1>
+      <p> Consider refreshing Strava Data if you think this is a mistake </p>
+      {% endif %}
       <!-- End Page content -->
       {% endblock %}
    </body>

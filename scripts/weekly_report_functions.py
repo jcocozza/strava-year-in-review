@@ -12,6 +12,7 @@ import app_config
 import plotly.express as px
 from flask import url_for
 #endregion - imports
+########## END IMPORTS ##########
 
 # General Overview of Process:
 # 0) Refresh Strava Data
@@ -124,12 +125,6 @@ def zone_data(heartrate_data, bin_array, labels):
 # expand heartrate data so that each element of an array of HR data has its own row (yes, this creates a ton of rows)
 def explode_hr_data(heartrate_data, bin_array, labels):
     explode_hr_data = heartrate_data.explode('data')
-
-    print('########## DEBUGGING ##########')
-
-    print(explode_hr_data)
-
-    print('########## END DEBUGGING ##########')
 
     exploded = explode_hr_data.loc[explode_hr_data['stream_type'] == 'heartrate'] # only bother with the heartrate data stream
     exploded['zone'] = pd.cut(exploded['data'], bins=bin_array, labels=labels) # set zones for each heart rate value
@@ -244,6 +239,9 @@ def activity_table(activity_data):
 def run_all(week_tuple, athlete_id, bin_array, labels, user_id):
     ########## GETTING ACTIVITY DATA ##########
     week_activity_data = get_week_activity_data(week_tuple, athlete_id)
+
+    if not week_activity_data: # If there is no data in the time frame then there is nothing we can do. 
+        return None
 
     ########## Make sure MySQL DB is up to date for HR and lap data ##########
     get_user_activity_data.api_to_mysql_heartrate_lap_data(week_activity_data, user_id)
