@@ -192,6 +192,23 @@ def mileage_graph(activity_data, user_id=None):
 
 def time_graph(activity_data, user_id=None):
     fig = px.bar(activity_data, x='start_date_local', y='moving_time', color='type')
+
+    update_menus = [] # the ability to choose between distance or time
+    buttons = [
+        {
+            'method':'restyle',
+            'label':'Time',
+            'args':[{'y': 'moving_time'},]
+        },
+        {
+            'method':'restyle',
+            'label':'Distance',
+            'args':[{'y': 'distance'},]
+        }]
+    
+    update_menus.append({'buttons':buttons})
+    fig.update_layout(updatemenus=update_menus)
+
     if user_id:
         fig.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_time_bar.html')
     else:
