@@ -152,7 +152,7 @@ def heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id=None):
     total_bin = bin_data(exploded_hr_data, bin_array, labels)
     pie = px.pie(total_bin, values='counts', labels='zones',names='zones', title='Heart Rate Zone Data')
 
-    update_menus = []
+    update_menus = [] # the ability to break down by activity_type
     buttons = [
         {
             'method':'restyle',
@@ -170,8 +170,8 @@ def heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id=None):
 
     pie.update_layout(updatemenus=update_menus)
 
-
     hist = px.histogram(total_bin, x="zones", y="counts", hover_data=total_bin.columns, title='Zone Distribution')
+    hist.update_layout(updatemenus=update_menus)
 
     if user_id:
         pie.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_hr_pie.html')
