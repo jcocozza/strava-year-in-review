@@ -171,7 +171,24 @@ def heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id=None):
     pie.update_layout(updatemenus=update_menus)
 
     hist = px.histogram(total_bin, x="zones", y="counts", hover_data=total_bin.columns, title='Zone Distribution')
-    hist.update_layout(updatemenus=update_menus)
+
+    update_menus2 = [] # the ability to break down by activity_type
+    buttons2 = [
+        {
+            'method':'restyle',
+            'label':'All',
+            'args':[{'y': [bin_data(exploded_hr_data, bin_array, labels)['counts']]},]
+        }]
+    for activity_type in exploded_hr_data['activity_type'].unique():
+        b = {
+                'method':'restyle',
+                'label':activity_type,
+                'args':[{'y': [bin_data(exploded_hr_data, bin_array, labels, activity_type=activity_type)['counts']]},]
+            }
+        buttons2.append(b)
+    update_menus2.append({'buttons':buttons})
+
+    hist.update_layout(updatemenus=update_menus2)
 
     if user_id:
         pie.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_hr_pie.html')
@@ -198,12 +215,12 @@ def time_graph(activity_data, user_id=None):
         {
             'method':'restyle',
             'label':'Time',
-            'args':[{'y': 'moving_time'},]
+            'args':[{'y': ['moving_time']},]
         },
         {
             'method':'restyle',
             'label':'Distance',
-            'args':[{'y': 'distance'},]
+            'args':[{'y': ['distance']},]
         }]
     
     update_menus.append({'buttons':buttons})
