@@ -227,7 +227,7 @@ def get_lap_data_for_activities(activity_data, user_id):
         temp_lap_df = get_activity_laps(activity_id=act, access_token=access_token)
         lap_data_frame = pd.concat([lap_data_frame, temp_lap_df])
 
-    file_path = cwd + '/data/' + str(user_id) + '_hr_data.csv'
+    file_path = cwd + '/data/' + str(user_id) + '_lap_data.csv'
 
     lap_data_frame.to_csv(file_path)
 
