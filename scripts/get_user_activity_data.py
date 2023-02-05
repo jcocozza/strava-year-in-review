@@ -174,7 +174,7 @@ def get_heartrate_data_for_activities(activity_data, user_id):
 
     hr_data_frame = pd.DataFrame()
     for act in activity_id_list:
-        temp_hr_df = get_heart_rate_activity_data(activity_id=act,access_token=access_token, user_id=user_id)
+        temp_hr_df = get_heart_rate_activity_data(activity_id=act,access_token=access_token)
         hr_data_frame = pd.concat([hr_data_frame, temp_hr_df])
     
     file_path = cwd + '/data/' + str(user_id) + '_hr_data.csv'
@@ -224,7 +224,7 @@ def get_lap_data_for_activities(activity_data, user_id):
 
     lap_data_frame = pd.DataFrame()
     for act in activity_id_list:
-        temp_lap_df = get_activity_laps(activity_id=act,access_token=access_token, user_id=user_id)
+        temp_lap_df = get_activity_laps(activity_id=act, access_token=access_token)
         lap_data_frame = pd.concat([lap_data_frame, temp_lap_df])
 
     file_path = cwd + '/data/' + str(user_id) + '_hr_data.csv'
