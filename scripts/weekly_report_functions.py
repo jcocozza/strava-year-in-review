@@ -53,13 +53,13 @@ def get_week_heartrate_data(week_data):
         sql = f"""SELECT hrd.activity_id, saad.`type` AS activity_type, hrd.`type` AS stream_type, hrd.series_type, hrd.`data`
                 FROM heartrate_data hrd
                 INNER JOIN strava_app_activity_data saad
-                ON saad.id = hrd.activity_i
+                ON saad.id = hrd.activity_id
                 WHERE hrd.activity_id = {t}"""
     else:
         sql = """SELECT hrd.activity_id, saad.`type` AS activity_type, hrd.`type` AS stream_type, hrd.series_type, hrd.`data`
         FROM heartrate_data hrd
         INNER JOIN strava_app_activity_data saad
-        ON saad.id = hrd.activity_i
+        ON saad.id = hrd.activity_id
         WHERE hrd.activity_id IN {}""".format(t)
 
     heartrate_data = sql_functions.local_sql_to_df(sql)
