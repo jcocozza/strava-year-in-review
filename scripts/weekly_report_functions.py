@@ -280,7 +280,7 @@ def activity_table(activity_data):
 ########## MAIN ##########
 #region - main
 
-def run_all(week_tuple, athlete_id, bin_array, labels, user_id):
+def run_all(week_tuple, athlete_id, bin_array, labels, user_id, duration=7):
     ########## GETTING ACTIVITY DATA ##########
     week_activity_data = get_week_activity_data(week_tuple, athlete_id)
 
@@ -296,9 +296,9 @@ def run_all(week_tuple, athlete_id, bin_array, labels, user_id):
 
     ########## DATA ANALYSIS ##########
     total_mileage = total_distance(week_activity_data)
-    avg_mileage = average_distance(week_activity_data, 7)
+    avg_mileage = average_distance(week_activity_data, duration)
     tot_time = total_time(week_activity_data)
-    avg_time = average_time(week_activity_data, 7)
+    avg_time = average_time(week_activity_data, duration)
 
     act_table = activity_table(week_activity_data)
     exploded_hr_data = explode_hr_data(week_heartrate_data, bin_array, labels)
