@@ -218,7 +218,7 @@ def mileage_graph(activity_data, user_id=None):
     return None
 
 def time_graph(activity_data, user_id=None):
-    fig = px.bar(activity_data, x='start_date_local', y='moving_time', color='type')
+    fig = px.histogram(activity_data, x='start_date_local', y='moving_time', color='type')
 
     update_menus = [] # the ability to choose between distance or time
     buttons = [
