@@ -180,13 +180,13 @@ def heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id=None):
             'args':[{'y': [bin_data(exploded_hr_data, bin_array, labels)['counts']]},]
         }]
     for activity_type in exploded_hr_data['activity_type'].unique():
-        b = {
+        b2 = {
                 'method':'restyle',
                 'label':activity_type,
                 'args':[{'y': [bin_data(exploded_hr_data, bin_array, labels, activity_type=activity_type)['counts']]},]
             }
-        buttons2.append(b)
-    update_menus2.append({'buttons':buttons})
+        buttons2.append(b2)
+    update_menus2.append({'buttons':buttons2})
 
     hist.update_layout(updatemenus=update_menus2)
 
