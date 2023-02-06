@@ -218,19 +218,21 @@ def mileage_graph(activity_data, user_id=None):
     return None
 
 def time_graph(activity_data, user_id=None):
-    fig = px.histogram(activity_data, x='start_date_local', y='moving_time', color='type')
+    fig = px.bar(activity_data, x='start_date_local', y='moving_time', color='type')
 
     update_menus = [] # the ability to choose between distance or time
     buttons = [
         {
-            'method':'restyle',
+            'method':'update',
             'label':'Time',
-            'args':[{'y': ['moving_time']},]
+            'args':[{'y': ['moving_time']},
+                    {'title': 'Moving Time'}]
         },
         {
-            'method':'restyle',
+            'method':'update',
             'label':'Distance',
-            'args':[{'y': ['distance']},]
+            'args':[{'y': ['distance']},
+                    {'title': 'Distance'}]
         }]
 
     update_menus.append({'buttons':buttons})
