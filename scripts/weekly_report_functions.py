@@ -225,13 +225,13 @@ def time_graph(activity_data, user_id=None):
         {
             'method':'update',
             'label':'Time',
-            'args':[{'y': ['moving_time']},
+            'args':[{'y': [activity_data['moving_time']]},
                     {'title': 'Moving Time'}]
         },
         {
             'method':'update',
             'label':'Distance',
-            'args':[{'y': ['distance']},
+            'args':[{'y': [activity_data['distance']]},
                     {'title': 'Distance'}]
         }]
 
