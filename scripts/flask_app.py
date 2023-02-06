@@ -186,7 +186,11 @@ def activity_list():
 # Query Activites in a Date Range; Provides some summary statistcs about them
 @app.route('/strava/ad_hoc', methods=['GET','POST'])
 def ad_hoc():
+    ##### PARAMETERS #####
+    bin_array = [0, 150, 160, 205]
+    labels = single_activity_analysis.zones(bin_array)
     user_id = session['id']
+    athlete_id = sql_functions.get_athlete_id()
     # Output message if something goes wrong
     msg = ''
     # Check if "start_date", "end_date" POST requests exist (user submitted form)
@@ -210,28 +214,8 @@ def ad_hoc():
 
             header = f'Summary for {start_date} to {end_date}'
 
-            ########## GETTING DATA ##########
-            athlete_id = sql_functions.get_athlete_id()
-            week_activity_data = weekly_report_functions.get_week_activity_data(week_tuple, athlete_id)
-            week_heartrate_data = weekly_report_functions.get_week_heartrate_data(week_activity_data, session['id'])
-            week_lap_data = weekly_report_functions.get_timeinterval_lap_data(week_activity_data, session['id'])
-
-            bin_array = [0, 150, 160, 205]
-            labels = single_activity_analysis.zones(bin_array)
-
-            ########## DATA ANALYSIS ##########
-            total_mileage = weekly_report_functions.total_distance(week_activity_data)
-            avg_mileage = weekly_report_functions.average_distance(week_activity_data, delta.days)
-            total_time = weekly_report_functions.total_time(week_activity_data)
-            avg_time = weekly_report_functions.average_time(week_activity_data, delta.days)
-
-            activity_table = weekly_report_functions.activity_table(week_activity_data)
-            binned_zone_data = weekly_report_functions.zone_data(week_heartrate_data, bin_array, labels)
-
-            ########## PLOTS ##########
-            hr_plot = weekly_report_functions.heart_rate_zone_plots(binned_zone_data, user_id)
-            mileage = weekly_report_functions.mileage_graph(week_activity_data, user_id)
-            time = weekly_report_functions.time_graph(week_activity_data, user_id)
+            # Get Data, Do Analysis, Generate and Save Plots
+            act_table = weekly_report_functions.run_all(week_tuple, athlete_id, bin_array, labels, user_id, duration=delta.days)
 
             src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html')
             src2 = url_for('static', filename=f'charts/{user_id}_weekly_hr_hist.html')
@@ -241,7 +225,7 @@ def ad_hoc():
             msg = 'Data Query Successful'
 
             # redirect to data table with rest of page
-            return render_template('ad_hoc_results.html', msg=msg, data_table=Markup(activity_table), src1=src1, src2=src2, src3=src3, src4=src4)
+            return render_template('ad_hoc_results.html', msg=msg, data_table=Markup(act_table), src1=src1, src2=src2, src3=src3, src4=src4)
 
     elif request.method == 'POST':
         # Form is empty... (no POST data)

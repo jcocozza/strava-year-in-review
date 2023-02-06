@@ -47,14 +47,20 @@ def get_week_activity_data(beginning_end, athlete_id):
 def get_week_heartrate_data(week_data):
     activity_id_list = week_data['id']
 
-    t = tuple(activity_id_list)
-    #sql = "SELECT * FROM heartrate_data WHERE `activity_id` IN {}".format(t)
-
-    sql = """SELECT hrd.activity_id, saad.`type` AS activity_type, hrd.`type` AS stream_type, hrd.series_type, hrd.`data`
-    FROM heartrate_data hrd
-    INNER JOIN strava_app_activity_data saad
-    ON saad.id = hrd.activity_id
-    WHERE hrd.activity_id IN {}""".format(t)
+    if len(activity_id_list) == 1:
+        t = activity_id_list[0]
+        sql = f"""SELECT hrd.activity_id, saad.`type` AS activity_type, hrd.`type` AS stream_type, hrd.series_type, hrd.`data`
+                FROM heartrate_data hrd
+                INNER JOIN strava_app_activity_data saad
+                ON saad.id = hrd.activity_id
+                WHERE hrd.activity_id = {t}"""
+    else:
+        t = tuple(activity_id_list)
+        sql = """SELECT hrd.activity_id, saad.`type` AS activity_type, hrd.`type` AS stream_type, hrd.series_type, hrd.`data`
+        FROM heartrate_data hrd
+        INNER JOIN strava_app_activity_data saad
+        ON saad.id = hrd.activity_id
+        WHERE hrd.activity_id IN {}""".format(t)
 
     heartrate_data = sql_functions.local_sql_to_df(sql)
 
@@ -66,8 +72,12 @@ def get_week_heartrate_data(week_data):
 def get_timeinterval_lap_data(week_data):
     activity_id_list = week_data['id']
 
-    t = tuple(activity_id_list)
-    sql = "SELECT * FROM lap_data WHERE `activity_id` IN {}".format(t)
+    if len(activity_id_list) == 1:
+        t = activity_id_list[0]
+        sql = f"SELECT * FROM lap_data WHERE `activity_id` = {t}"
+    else:
+        t = tuple(activity_id_list)
+        sql = "SELECT * FROM lap_data WHERE `activity_id` IN {}".format(t)
     lap_data = sql_functions.local_sql_to_df(sql)
     return lap_data
 
@@ -152,7 +162,7 @@ def heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id=None):
     total_bin = bin_data(exploded_hr_data, bin_array, labels)
     pie = px.pie(total_bin, values='counts', labels='zones',names='zones', title='Heart Rate Zone Data')
 
-    update_menus = []
+    update_menus = [] # the ability to break down by activity_type
     buttons = [
         {
             'method':'restyle',
@@ -170,8 +180,25 @@ def heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id=None):
 
     pie.update_layout(updatemenus=update_menus)
 
-
     hist = px.histogram(total_bin, x="zones", y="counts", hover_data=total_bin.columns, title='Zone Distribution')
+
+    update_menus2 = [] # the ability to break down by activity_type
+    buttons2 = [
+        {
+            'method':'restyle',
+            'label':'All',
+            'args':[{'y': [bin_data(exploded_hr_data, bin_array, labels)['counts']]},]
+        }]
+    for activity_type in exploded_hr_data['activity_type'].unique():
+        b2 = {
+                'method':'restyle',
+                'label':activity_type,
+                'args':[{'y': [bin_data(exploded_hr_data, bin_array, labels, activity_type=activity_type)['counts']]},]
+            }
+        buttons2.append(b2)
+    update_menus2.append({'buttons':buttons2})
+
+    hist.update_layout(updatemenus=update_menus2)
 
     if user_id:
         pie.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_hr_pie.html')
@@ -187,11 +214,11 @@ def mileage_graph(activity_data, user_id=None):
         fig.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_mileage_bar.html')
     else:
         fig.write_html(cwd + '/scripts/static/charts/weekly_mileage_bar.html')
-
     return None
 
 def time_graph(activity_data, user_id=None):
     fig = px.bar(activity_data, x='start_date_local', y='moving_time', color='type')
+
     if user_id:
         fig.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_time_bar.html')
     else:
@@ -236,11 +263,11 @@ def activity_table(activity_data):
 ########## MAIN ##########
 #region - main
 
-def run_all(week_tuple, athlete_id, bin_array, labels, user_id):
+def run_all(week_tuple, athlete_id, bin_array, labels, user_id, duration=7):
     ########## GETTING ACTIVITY DATA ##########
     week_activity_data = get_week_activity_data(week_tuple, athlete_id)
 
-    if week_activity_data.empty: # If there is no data in the time frame then there is nothing we can do. 
+    if week_activity_data.empty: # If there is no data in the time frame then there is nothing we can do.
         return 'There are no detected activites for this week. Consider refreshing strava data if you think this is a mistake.'
 
     ########## Make sure MySQL DB is up to date for HR and lap data ##########
@@ -252,9 +279,9 @@ def run_all(week_tuple, athlete_id, bin_array, labels, user_id):
 
     ########## DATA ANALYSIS ##########
     total_mileage = total_distance(week_activity_data)
-    avg_mileage = average_distance(week_activity_data, 7)
+    avg_mileage = average_distance(week_activity_data, duration)
     tot_time = total_time(week_activity_data)
-    avg_time = average_time(week_activity_data, 7)
+    avg_time = average_time(week_activity_data, duration)
 
     act_table = activity_table(week_activity_data)
     exploded_hr_data = explode_hr_data(week_heartrate_data, bin_array, labels)
