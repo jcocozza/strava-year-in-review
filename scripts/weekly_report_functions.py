@@ -48,12 +48,13 @@ def get_week_heartrate_data(week_data):
     activity_id_list = week_data['id']
 
     t = tuple(activity_id_list)
-    #sql = "SELECT * FROM heartrate_data WHERE `activity_id` IN {}".format(t)
+    if len(t) == 1:
+        t = activity_id_list[0]
 
     sql = """SELECT hrd.activity_id, saad.`type` AS activity_type, hrd.`type` AS stream_type, hrd.series_type, hrd.`data`
     FROM heartrate_data hrd
     INNER JOIN strava_app_activity_data saad
-    ON saad.id = hrd.activity_id
+    ON saad.id = hrd.activity_i
     WHERE hrd.activity_id IN {}""".format(t)
 
     heartrate_data = sql_functions.local_sql_to_df(sql)
