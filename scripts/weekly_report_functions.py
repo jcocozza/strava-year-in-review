@@ -47,8 +47,7 @@ def get_week_activity_data(beginning_end, athlete_id):
 def get_week_heartrate_data(week_data):
     activity_id_list = week_data['id']
 
-    t = tuple(activity_id_list)
-    if len(t) == 1:
+    if len(activity_id_list) == 1:
         t = activity_id_list[0]
         sql = f"""SELECT hrd.activity_id, saad.`type` AS activity_type, hrd.`type` AS stream_type, hrd.series_type, hrd.`data`
                 FROM heartrate_data hrd
@@ -56,6 +55,7 @@ def get_week_heartrate_data(week_data):
                 ON saad.id = hrd.activity_id
                 WHERE hrd.activity_id = {t}"""
     else:
+        t = tuple(activity_id_list)
         sql = """SELECT hrd.activity_id, saad.`type` AS activity_type, hrd.`type` AS stream_type, hrd.series_type, hrd.`data`
         FROM heartrate_data hrd
         INNER JOIN strava_app_activity_data saad
@@ -72,8 +72,12 @@ def get_week_heartrate_data(week_data):
 def get_timeinterval_lap_data(week_data):
     activity_id_list = week_data['id']
 
-    t = tuple(activity_id_list)
-    sql = "SELECT * FROM lap_data WHERE `activity_id` IN {}".format(t)
+    if len(activity_id_list) == 1:
+        t = activity_id_list[0]
+        sql = f"SELECT * FROM lap_data WHERE `activity_id` = {t}"
+    else:
+        t = tuple(activity_id_list)
+        sql = "SELECT * FROM lap_data WHERE `activity_id` IN {}".format(t)
     lap_data = sql_functions.local_sql_to_df(sql)
     return lap_data
 
@@ -228,7 +232,7 @@ def time_graph(activity_data, user_id=None):
             'label':'Distance',
             'args':[{'y': ['distance']},]
         }]
-    
+
     update_menus.append({'buttons':buttons})
     fig.update_layout(updatemenus=update_menus)
 
@@ -280,7 +284,7 @@ def run_all(week_tuple, athlete_id, bin_array, labels, user_id):
     ########## GETTING ACTIVITY DATA ##########
     week_activity_data = get_week_activity_data(week_tuple, athlete_id)
 
-    if week_activity_data.empty: # If there is no data in the time frame then there is nothing we can do. 
+    if week_activity_data.empty: # If there is no data in the time frame then there is nothing we can do.
         return 'There are no detected activites for this week. Consider refreshing strava data if you think this is a mistake.'
 
     ########## Make sure MySQL DB is up to date for HR and lap data ##########
