@@ -1,11 +1,18 @@
 ########## IMPORTS ##########
 #region - imports
 from ratelimit import limits, sleep_and_retry
+import os
 import requests
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 #endregion - imports
 ########## END IMPORTS ##########
+
+########## Setting working directory ##########
+cwd = os.getcwd()
+repo_dir = cwd + '/strava-year-in-review'
+cwd = repo_dir
+log_path = cwd + "/logs/api_log.txt" # where to write log to
 
 ########## THROTTLE ##########
 #region - Throttle
@@ -23,6 +30,18 @@ def call_api(url, access_token, parameter=None):
 
         if response.status_code != 200:
             raise Exception('API responese: {}'.format(response.status_code))
+
+        # writing to the log file for various information about the API call
+        # writes to api_log.txt in the log folder
+        with open(log_path, 'a+') as log:
+            log.write('########## START LOG ##########\n')
+            log.write(f'API call for: {url}\n')
+            log.write(f'Header: {header}\n')
+            if parameter:
+                log.write(f'Parameters passed: {parameter}\n')
+            log.write(f'Response status code: {response.status_code}\n')
+            log.write('########## END LOG ##########\n')
+        
         return response
 #endregion - Throttle
 ########## END THROTTLE ##########
