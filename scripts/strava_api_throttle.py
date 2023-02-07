@@ -12,7 +12,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 cwd = os.getcwd()
 repo_dir = cwd + '/strava-year-in-review'
 cwd = repo_dir
-log_path = cwd + "/data/api_log.txt" # where to write log to
+log_path = cwd + "/logs/api_log.txt" # where to write log to
 
 ########## THROTTLE ##########
 #region - Throttle
@@ -32,7 +32,7 @@ def call_api(url, access_token, parameter=None):
             raise Exception('API responese: {}'.format(response.status_code))
 
         # writing to the log file for various information about the API call
-        # writes to api_log.txt in the data folder
+        # writes to api_log.txt in the log folder
         with open(log_path, 'a+') as log:
             log.write('########## START LOG ##########\n')
             log.write(f'API call for: {url}\n')
