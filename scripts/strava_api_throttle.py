@@ -33,13 +33,13 @@ def call_api(url, access_token, parameter=None):
             raise Exception('API responese: {}'.format(response.status_code))
 
         with open(log_path, 'w') as log:
-            log.write('########## START LOG ##########')
-            log.write(f'API CALL FOR: {url}')
-            log.write(f'Header: {header}')
+            log.write('########## START LOG ##########\n')
+            log.write(f'API CALL FOR: {url}\n')
+            log.write(f'Header: {header}\n')
             if parameter:
-                log.write(f'Parameters passed: {parameter}')
-            log.write(f'Response status code: {response.status_code}')
-            log.write('########## END LOG ##########')
+                log.write(f'Parameters passed: {parameter}\n')
+            log.write(f'Response status code: {response.status_code}\n')
+            log.write('########## END LOG ##########\n')
         
         return response
 #endregion - Throttle
