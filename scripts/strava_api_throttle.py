@@ -33,7 +33,7 @@ def call_api(url, access_token, parameter=None):
 
         # writing to the log file for various information about the API call
         # writes to api_log.txt in the data folder
-        with open(log_path, 'w') as log:
+        with open(log_path, 'a+') as log:
             log.write('########## START LOG ##########\n')
             log.write(f'API call for: {url}\n')
             log.write(f'Header: {header}\n')
