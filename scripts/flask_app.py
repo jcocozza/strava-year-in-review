@@ -254,8 +254,9 @@ def weekly_summary():
 
     header = f'Summary for {week_start} to {week_end}'
 
-    # Get Data, Do Analysis, Generate and Save Plots
-    act_table = weekly_report_functions.run_all(week_tuple, athlete_id, bin_array, labels, user_id)
+    # Get Data, Do Analysis, Generate and Save Plots; returns a tuple of information: (act_table, total_mileage, avg_mileage, tot_time, avg_time)
+    summary_data = weekly_report_functions.run_all(week_tuple, athlete_id, bin_array, labels, user_id)
+
 
     #### urls for plots/graphs
     src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html')
@@ -263,7 +264,12 @@ def weekly_summary():
     src3 = url_for('static', filename=f'charts/{user_id}_weekly_mileage_bar.html')
     src4 = url_for('static', filename=f'charts/{user_id}_weekly_time_bar.html')
 
-    return render_template('weekly_summary.html', header=header, activity_table=Markup(act_table), src1=src1, src2=src2, src3=src3, src4=src4)
+    return render_template('weekly_summary.html', header=header, activity_table=Markup(summary_data[0]),
+                             src1=src1, src2=src2, src3=src3, src4=src4,
+                             total_mileage=summary_data[1],
+                             avg_mileage=summary_data[2],
+                             tot_time=summary_data[2],
+                             avg_time=summary_data[4])
 
 # An analysis of an individual activity; will come with ?activity_id=XXXXXXXX in url for the GET method
 @app.route('/strava/weekly_summary/activity_analysis', methods=['GET'])
@@ -281,7 +287,7 @@ def activity_analysis():
     src3 = url_for('static', filename=f'charts/{user_id}_{activity_id}_hr_plot.html')
     src4 = url_for('static', filename=f'charts/{user_id}_{activity_id}_lap_tbl.html')
 
-    return render_template('single_activity_analysis.html', src1=src1, src2=src2, src3=src3, src4=src4)
+    return render_template('single_activity_analysis.html', src1=src1, src2=src2, src3=src3, src4=src4, id=activity_id)
 #endregion - Strava Tasks
 #endregion - Strava
 

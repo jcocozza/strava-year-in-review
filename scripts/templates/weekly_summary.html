@@ -11,6 +11,24 @@
       {% if activity_table %}
       <!-- Page content -->
       <h1> {{ header }} </h1>
+
+      <h2> Overview: </h2>
+      <!-- total_mileage, avg_mileage, tot_time, avg_time -->
+         <table>
+            <tr>
+               <th>Total Mileage</th>
+               <th>Average Mileage</th>
+               <th>Total Time</th>
+               <th>Average Time</th>
+            </tr>
+            <tr>
+               <td>{{ total_mileage }}</td>
+               <td>{{ avg_mileage }}</td>
+               <td> {{ tot_time }}</td>
+               <td> {{ avg_time }}</td>
+            </tr>
+         </table>
+
       <h2> Activites for the week </h2>
       <p> {{ activity_table }} </p>
 
