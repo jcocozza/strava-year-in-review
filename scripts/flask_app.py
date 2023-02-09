@@ -268,7 +268,7 @@ def weekly_summary():
                              src1=src1, src2=src2, src3=src3, src4=src4,
                              total_mileage=summary_data[1],
                              avg_mileage=summary_data[2],
-                             tot_time=summary_data[2],
+                             tot_time=summary_data[3],
                              avg_time=summary_data[4])
 
 # An analysis of an individual activity; will come with ?activity_id=XXXXXXXX in url for the GET method
