@@ -291,6 +291,6 @@ def run_all(week_tuple, athlete_id, bin_array, labels, user_id, duration=7):
     mileage = mileage_graph(week_activity_data, user_id)
     time = time_graph(week_activity_data, user_id)
 
-    return act_table
+    return (act_table, total_mileage, avg_mileage, tot_time, avg_time)
 #endregion - main
 ########## END MAIN ##########
