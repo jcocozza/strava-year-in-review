@@ -2,6 +2,7 @@
 #region - imports
 from genericpath import exists
 import pandas as pd
+import numpy as np
 import sqlalchemy
 from sqlalchemy import text
 import pymysql
@@ -175,10 +176,10 @@ def local_sql_to_df(query, parse_dates=None):
 ########## DATABASE TRANSFORMATIONS ##########
 #region - database transformations
 
-sql1 = """UPDATE strava_app_activity_data  
+sql1 = """UPDATE strava_app_activity_data
         SET distance = (distance/1609.344),
             moving_time = (moving_time/60),
-            elapsed_time = (elapsed_time/60), 
+            elapsed_time = (elapsed_time/60),
             average_speed = (1609.344/(average_speed*60)),
             max_speed = (1609.344/(max_speed*60)),
             is_transformed = TRUE
@@ -187,7 +188,7 @@ sql1 = """UPDATE strava_app_activity_data
 sql2 = """UPDATE lap_data
         SET distance = (distance/1609.344),
             moving_time = (moving_time/60),
-            elapsed_time = (elapsed_time/60), 
+            elapsed_time = (elapsed_time/60),
             average_speed = (1609.344/(average_speed*60)),
             max_speed = (1609.344/(max_speed*60)),
             is_transformed = TRUE
@@ -209,6 +210,7 @@ def transform_df(df):
     df['average_speed'] = (1609.344/(df['average_speed']*60))
     df['max_speed'] = (1609.344/(df['max_speed']*60))
     df['is_transformed'] = True
+    df = df.replace([np.inf, -np.inf], np.nan)
     return df
 
 
