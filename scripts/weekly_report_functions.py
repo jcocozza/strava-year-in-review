@@ -8,6 +8,7 @@ import flask_app
 import pandas as pd
 import os
 import math
+import numpy as np
 import sqlalchemy
 import app_config
 import plotly.express as px
@@ -228,7 +229,7 @@ def time_graph(activity_data, user_id=None):
 
 # takes in a float that represents the average speed in min/mile, converts it to a string in the form minutes:seconds
 def min_mile_to_string(avg_speed):
-    if avg_speed:
+    if not math.isnan(avg_speed):
         dec_seconds, minutes = math.modf(avg_speed)
         num_sec = dec_seconds * 60
 
