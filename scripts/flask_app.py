@@ -269,7 +269,8 @@ def weekly_summary():
                              total_mileage=summary_data[1],
                              avg_mileage=summary_data[2],
                              tot_time=summary_data[3],
-                             avg_time=summary_data[4])
+                             avg_time=summary_data[4],
+                             tot_elev=summary_data[5])
 
 # An analysis of an individual activity; will come with ?activity_id=XXXXXXXX in url for the GET method
 @app.route('/strava/weekly_summary/activity_analysis', methods=['GET'])

@@ -103,6 +103,9 @@ def total_time(activity_data):
 def average_time(activity_data, time_interval):
     return total_time(activity_data)/time_interval
 
+def total_elevation_gain(activity_data):
+    return sum(activity_data['total_elevation_gain'])
+
 # will return a link for a given activity_id
 def generate_link(activity_id):
     #link = url_for('activity_analysis', id=activity_id) -- try this in the future so we don't have to hard code anything
@@ -247,7 +250,7 @@ def activity_table(activity_data):
                     <th>date (day/time)</th>
                     <th>distance (miles)</th>
                     <th>moving_time (minutes)</th>
-                    <th>total_elevation_gain (feet)</th>
+                    <th>total_elevation_gain (meters)</th>
                     <th>type</th>
                     <th>average_speed (minutes/mile)</th>
                     <th>average_heartrate (bpm)</th>
@@ -295,6 +298,7 @@ def run_all(week_tuple, athlete_id, bin_array, labels, user_id, duration=7):
     avg_mileage = average_distance(week_activity_data, duration)
     tot_time = total_time(week_activity_data)
     avg_time = average_time(week_activity_data, duration)
+    total_elevation = total_elevation_gain(week_activity_data)
 
     act_table = activity_table(week_activity_data)
     exploded_hr_data = explode_hr_data(week_heartrate_data, bin_array, labels)
@@ -304,6 +308,6 @@ def run_all(week_tuple, athlete_id, bin_array, labels, user_id, duration=7):
     mileage = mileage_graph(week_activity_data, user_id)
     time = time_graph(week_activity_data, user_id)
 
-    return (act_table, total_mileage, avg_mileage, tot_time, avg_time)
+    return (act_table, total_mileage, avg_mileage, tot_time, avg_time, total_elevation)
 #endregion - main
 ########## END MAIN ##########
