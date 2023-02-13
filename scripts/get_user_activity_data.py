@@ -231,7 +231,7 @@ def get_lap_data_for_activities(activity_data, user_id):
 
     file_path = cwd + '/data/' + str(user_id) + '_lap_data.csv'
 
-    lap_data_frame = sql_functions.transform_df(lap_data_frame) # transform data
+    # lap_data_frame = sql_functions.transform_df(lap_data_frame) # transform data, not doing this for now b/c it messes up the graphs
 
     lap_data_frame.to_csv(file_path)
 
