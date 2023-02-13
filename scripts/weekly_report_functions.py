@@ -228,11 +228,14 @@ def time_graph(activity_data, user_id=None):
 
 # takes in a float that represents the average speed in min/mile, converts it to a string in the form minutes:seconds
 def min_mile_to_string(avg_speed):
-    dec_seconds, minutes = math.modf(avg_speed)
-    num_sec = dec_seconds * 60
+    if avg_speed:
+        dec_seconds, minutes = math.modf(avg_speed)
+        num_sec = dec_seconds * 60
 
-    string = str(int(minutes)) + ":" + str(int(num_sec))
-    return string
+        string = str(int(minutes)) + ":" + str(int(num_sec))
+        return string
+    else:
+        return avg_speed
 
 def activity_table(activity_data):
     #tbl = activity_data[['name', 'distance', 'moving_time', 'total_elevation_gain', 'type', 'average_speed', 'average_heartrate']]
