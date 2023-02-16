@@ -134,7 +134,7 @@ def heart_rate_data_plot(series_data, lap_data, activity_id, user_id=None):
 #Generates a table of lap activity data; include user_id to save files properly
 def activity_lap_data_table(lap_data, activity_id, user_id=None):
     tbl = go.Figure(data=[go.Table(
-    header=dict(values=['name','distance', 'moving time', 'elevation gain', 'average speed', 'average heartrate', 'max heartrate'],
+    header=dict(values=['name','distance(meters)', 'moving time(seconds)', 'elevation gain(meters)', 'average speed(mph)', 'average heartrate(bpm)', 'max heartrate(bpm)'],
                 fill_color='paleturquoise',
                 align='left'),
     cells=dict(values=[lap_data.name, lap_data.distance, lap_data.moving_time, lap_data.total_elevation_gain, lap_data.average_speed, lap_data.average_heartrate, lap_data.max_heartrate],
