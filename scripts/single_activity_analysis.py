@@ -142,7 +142,7 @@ def activity_lap_data_table(lap_data, activity_id, user_id=None):
                align='left'))
     ])
 
-    tbl.update_layout(text_title='Laps taken during activity')
+    tbl.update_layout(title_text='Laps taken during activity')
 
     if user_id:
         tbl.write_html(cwd + f'/scripts/static/charts/{user_id}_{activity_id}_lap_tbl.html')
