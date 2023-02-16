@@ -129,6 +129,8 @@ def get_user_activity_data(access_token, user_id=None, pages_to_pull=None):
         print('Data pull has failed: ', ex)
         exit(1)
     else:
+        activities = sql_functions.transform_df(activities) # Run data transformations
+
         if user_id:
             file_path = cwd + '/data/' + str(user_id) + '_data.csv'
             activities.to_csv(file_path) # save data to a csv
@@ -228,6 +230,8 @@ def get_lap_data_for_activities(activity_data, user_id):
         lap_data_frame = pd.concat([lap_data_frame, temp_lap_df])
 
     file_path = cwd + '/data/' + str(user_id) + '_lap_data.csv'
+
+    # lap_data_frame = sql_functions.transform_df(lap_data_frame) # transform data, not doing this for now b/c it messes up the graphs
 
     lap_data_frame.to_csv(file_path)
 

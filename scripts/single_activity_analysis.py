@@ -82,6 +82,8 @@ def heart_rate_zone_plots(binned_counts, activity_id, user_id=None):
     pie = px.pie(binned_counts, values='counts', labels='zones',names='zones', title='Heart Rate Zone Data')
     hist = px.histogram(binned_counts, x="zones", y="counts", hover_data=binned_counts.columns, title='Zone Distribution')
 
+    hist.update_layout(yaxis_title="amount in zone (arbritary units)")
+
     if user_id:
         pie.write_html(cwd + f'/scripts/static/charts/{user_id}_{activity_id}_hr_pie.html')
         hist.write_html(cwd + f'/scripts/static/charts/{user_id}_{activity_id}_hr_hist.html')
@@ -119,6 +121,8 @@ def heart_rate_data_plot(series_data, lap_data, activity_id, user_id=None):
                 color = 'green'
             fig.add_vrect(x0=begin, x1=end, line_width=0, fillcolor=color, opacity=0.2, annotation_text=name)
 
+    fig.update_layout(yaxis_title="Heart Rate (BPM)")
+
     if user_id:
         fig.write_html(cwd + f'/scripts/static/charts/{user_id}_{activity_id}_hr_plot.html')
     else:
@@ -130,13 +134,15 @@ def heart_rate_data_plot(series_data, lap_data, activity_id, user_id=None):
 #Generates a table of lap activity data; include user_id to save files properly
 def activity_lap_data_table(lap_data, activity_id, user_id=None):
     tbl = go.Figure(data=[go.Table(
-    header=dict(values=['name','distance', 'moving time', 'elevation gain', 'average speed', 'average heartrate', 'max heartrate'],
+    header=dict(values=['name','distance(meters)', 'moving time(seconds)', 'elevation gain(meters)', 'average speed(mph)', 'average heartrate(bpm)', 'max heartrate(bpm)'],
                 fill_color='paleturquoise',
                 align='left'),
     cells=dict(values=[lap_data.name, lap_data.distance, lap_data.moving_time, lap_data.total_elevation_gain, lap_data.average_speed, lap_data.average_heartrate, lap_data.max_heartrate],
                fill_color='lavender',
                align='left'))
     ])
+
+    tbl.update_layout(title_text='Laps taken during activity')
 
     if user_id:
         tbl.write_html(cwd + f'/scripts/static/charts/{user_id}_{activity_id}_lap_tbl.html')

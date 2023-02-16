@@ -7,6 +7,8 @@ from ast import literal_eval # used to covert an array string to an actual array
 import flask_app
 import pandas as pd
 import os
+import math
+import numpy as np
 import sqlalchemy
 import app_config
 import plotly.express as px
@@ -94,12 +96,15 @@ def total_distance(activity_data):
 def average_distance(activity_data, time_interval):
     return total_distance(activity_data)/time_interval
 
-# Total time in a given set of activities
+# Total time in a given set of activities (in hours)
 def total_time(activity_data):
-    return sum(activity_data['moving_time'])
-# Average time in a given set of activities over a given time period
+    return sum(activity_data['moving_time'])/60
+# Average time in a given set of activities over a given time period (in hours)
 def average_time(activity_data, time_interval):
     return total_time(activity_data)/time_interval
+
+def total_elevation_gain(activity_data):
+    return sum(activity_data['total_elevation_gain'])
 
 # will return a link for a given activity_id
 def generate_link(activity_id):
@@ -198,7 +203,7 @@ def heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id=None):
         buttons2.append(b2)
     update_menus2.append({'buttons':buttons2})
 
-    hist.update_layout(updatemenus=update_menus2)
+    hist.update_layout(updatemenus=update_menus2, yaxis_title="amount in zone (arbritary units)")
 
     if user_id:
         pie.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_hr_pie.html')
@@ -225,19 +230,30 @@ def time_graph(activity_data, user_id=None):
         fig.write_html(cwd + '/scripts/static/charts/weekly_time_bar.html')
     return None
 
+# takes in a float that represents the average speed in min/mile, converts it to a string in the form minutes:seconds
+def min_mile_to_string(avg_speed):
+    if not math.isnan(avg_speed):
+        dec_seconds, minutes = math.modf(avg_speed)
+        num_sec = dec_seconds * 60
+
+        string = str(int(minutes)) + ":" + str(int(num_sec))
+        return string
+    else:
+        return avg_speed
+
 def activity_table(activity_data):
     #tbl = activity_data[['name', 'distance', 'moving_time', 'total_elevation_gain', 'type', 'average_speed', 'average_heartrate']]
 
     html =  """<table>
                 <tr>
                     <th>name</th>
-                    <th>date</th>
-                    <th>distance</th>
-                    <th>moving_time</th>
-                    <th>total_elevation_gain</th>
+                    <th>date (day/time)</th>
+                    <th>distance (miles)</th>
+                    <th>moving_time (minutes)</th>
+                    <th>total_elevation_gain (meters)</th>
                     <th>type</th>
-                    <th>average_speed</th>
-                    <th>average_heartrate</th>
+                    <th>average_speed (minutes/mile)</th>
+                    <th>average_heartrate (bpm)</th>
                 </tr>"""
 
     for id,date,name,dist,mt,teg,type,avg_speed,avg_hr in zip(activity_data['id'], activity_data['start_date_local'], activity_data['name'], activity_data['distance'], activity_data['moving_time'], activity_data['total_elevation_gain'], activity_data['type'], activity_data['average_speed'], activity_data['average_heartrate']):
@@ -250,7 +266,7 @@ def activity_table(activity_data):
                          <td>{mt}</td>
                          <td>{teg}</td>
                          <td>{type}</td>
-                         <td>{avg_speed}</td>
+                         <td>{min_mile_to_string(avg_speed)}</td>
                          <td>{avg_hr}</td>
                         </tr>"""
     html += """</table>"""
@@ -282,6 +298,7 @@ def run_all(week_tuple, athlete_id, bin_array, labels, user_id, duration=7):
     avg_mileage = average_distance(week_activity_data, duration)
     tot_time = total_time(week_activity_data)
     avg_time = average_time(week_activity_data, duration)
+    total_elevation = total_elevation_gain(week_activity_data)
 
     act_table = activity_table(week_activity_data)
     exploded_hr_data = explode_hr_data(week_heartrate_data, bin_array, labels)
@@ -291,6 +308,6 @@ def run_all(week_tuple, athlete_id, bin_array, labels, user_id, duration=7):
     mileage = mileage_graph(week_activity_data, user_id)
     time = time_graph(week_activity_data, user_id)
 
-    return (act_table, total_mileage, avg_mileage, tot_time, avg_time)
+    return (act_table, total_mileage, avg_mileage, tot_time, avg_time, total_elevation)
 #endregion - main
 ########## END MAIN ##########

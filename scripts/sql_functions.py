@@ -2,6 +2,7 @@
 #region - imports
 from genericpath import exists
 import pandas as pd
+import numpy as np
 import sqlalchemy
 from sqlalchemy import text
 import pymysql
@@ -105,7 +106,6 @@ def activity_id_not_in_list(activity_list, tbl):
     not_in_activity_list = list(set(activity_list) & set(li)) # get the data NOT in hr table and that we want to pull
     return not_in_activity_list
 
-
 # gets a users refresh token
 def get_refresh_token(user_id=None):
     if user_id:
@@ -172,3 +172,50 @@ def local_sql_to_df(query, parse_dates=None):
     else:
         print('Data Successfully Queried...')
         return df
+
+########## DATABASE TRANSFORMATIONS ##########
+#region - database transformations
+
+sql1 = """UPDATE strava_app_activity_data
+        SET distance = (distance/1609.344),
+            moving_time = (moving_time/60),
+            elapsed_time = (elapsed_time/60),
+            average_speed = (1609.344/(average_speed*60)),
+            max_speed = (1609.344/(max_speed*60)),
+            is_transformed = TRUE
+        WHERE is_transformed = FALSE;"""
+
+sql2 = """UPDATE lap_data
+        SET distance = (distance/1609.344),
+            moving_time = (moving_time/60),
+            elapsed_time = (elapsed_time/60),
+            average_speed = (1609.344/(average_speed*60)),
+            max_speed = (1609.344/(max_speed*60)),
+            is_transformed = TRUE
+        WHERE is_transformed = FALSE; """
+
+def transform_data(transformation_sql):
+    print(f'Transforming Data for {transformation_sql}')
+    string = generate_engine_string(app_config.db_user, app_config.db_password, app_config.db_host, app_config.db_name)
+    connection = engine_connection(string)
+
+    result = connection.execute(transformation_sql)
+    return result
+
+
+def transform_df(df):
+    df["distance"] = (df["distance"]/1609.344)
+    df["moving_time"] = (df['moving_time']/60)
+    df['elapsed_time'] = (df['elapsed_time']/60)
+    df['average_speed'] = (1609.344/(df['average_speed']*60))
+    df['max_speed'] = (1609.344/(df['max_speed']*60))
+    df['is_transformed'] = True
+    df = df.replace([np.inf, -np.inf], np.nan)
+    return df
+
+
+
+#endregion - database transformations
+########## DATABASE TRANSFORMATIONS ##########
+
+
