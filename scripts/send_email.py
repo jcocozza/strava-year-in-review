@@ -4,7 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from os.path import basename
 from app_config import EMAIL, PAS
-from report import email_html
+from report import create_report
 import sys
 
 def send_email(receiver, subject, text_ver, html_ver):
@@ -43,4 +43,7 @@ if __name__ == '__main__':
     reciever = sys.argv[1]
     subject = 'Weekly Report'
     text = 'email report'
-    send_email(reciever, subject, text, email_html)
+    bin_array = [0, 150, 160, 205]
+    html = create_report(bin_array=bin_array, user_id=12, athlete_id=24403919, start_date='2022-02-20', end_date='2022-02-24') # testing with my parameters
+    send_email(reciever, subject, text, html)
+
