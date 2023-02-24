@@ -211,7 +211,7 @@ def heart_rate_zone_plots(exploded_hr_data, bin_array, labels, user_id=None):
     else:
         pie.write_html(cwd + '/scripts/static/charts/weekly_hr_pie.html')
         hist.write_html(cwd + '/scripts/static/charts/weekly_hr_hist.html')
-    return None
+    return pie, hist
 
 def mileage_graph(activity_data, user_id=None):
     fig = px.bar(activity_data, x='start_date_local', y='distance', color='type')
@@ -219,7 +219,7 @@ def mileage_graph(activity_data, user_id=None):
         fig.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_mileage_bar.html')
     else:
         fig.write_html(cwd + '/scripts/static/charts/weekly_mileage_bar.html')
-    return None
+    return fig
 
 def time_graph(activity_data, user_id=None):
     fig = px.bar(activity_data, x='start_date_local', y='moving_time', color='type')
@@ -228,7 +228,7 @@ def time_graph(activity_data, user_id=None):
         fig.write_html(cwd + f'/scripts/static/charts/{user_id}_weekly_time_bar.html')
     else:
         fig.write_html(cwd + '/scripts/static/charts/weekly_time_bar.html')
-    return None
+    return fig
 
 # takes in a float that represents the average speed in min/mile, converts it to a string in the form minutes:seconds
 def min_mile_to_string(avg_speed):
