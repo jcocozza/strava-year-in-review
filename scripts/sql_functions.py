@@ -14,6 +14,7 @@ from flask import session
 # For handling duplicates
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import Insert
+from ast import literal_eval
 #endregion - imports
 ########## END IMPORTS ##########
 
@@ -77,23 +78,7 @@ def get_athlete_id():
     sql = "SELECT athlete_id FROM users WHERE user_id = %s" % (session['id'],)
     id = local_sql_to_df(sql)['athlete_id'][0]
     return id
-'''
-# check if an activity is in a table
-# returns true if the activity_id is in the table
-# otherwise returns false
-def check_if_in(activity_id, tbl):
-    sql = f'SELECT activity_id FROM {tbl} WHERE activity_id = {activity_id}'
-    df = local_sql_to_df(sql)
-    return not df.empty
 
-# returns activity_id's not in the table
-def activity_id_not_in_list(activity_list, tbl):
-    not_in_activity_list = []
-    for activity in activity_list:
-        if not check_if_in(activity, tbl):
-            not_in_activity_list.append(activity)
-    return not_in_activity_list
-'''
 def activity_id_not_in_list(activity_list, tbl):
     sql = f"""SELECT saad.id
                 FROM strava_app_activity_data saad
@@ -115,6 +100,19 @@ def get_refresh_token(user_id=None):
     data = local_sql_to_df(sql) # get refresh token from db
     refresh_token = data['refresh_token'][0]
     return refresh_token
+
+def get_user_package(user_id):
+    sql = f"SELECT * FROM users WHERE user_id = {user_id}"
+    data = local_sql_to_df(sql)
+
+    package = {
+        'user_id' : user_id,
+        'athlete_id' : data.athlete_id[0],
+        'bin_array' : literal_eval(data.bin_array[0]),
+        'email' : data.email[0]
+    }
+
+    return package
 
 # leverages pandas' to_sql function, see: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_sql.html
 # uploads a pandas dataframe to a table

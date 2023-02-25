@@ -6,6 +6,7 @@ from app_config import EMAIL, PAS
 from report import create_report
 import sys
 import os
+import sql_functions
 ########## Setting working directory ##########
 image_path = os.getcwd() + '/strava-year-in-review/scripts/static/images/'
 
@@ -54,12 +55,15 @@ def send_email(receiver, subject, text_ver, html_ver, image_list):
 
 
 def main():
-    reciever = sys.argv[1]
-    user_id = 12
+    user_id = sys.argv[1]
+    package = sql_functions.get_user_package(user_id)
+    reciever = package['email']
+    bin_array = package['bin_array']
+    athlete_id = package['athlete_id']
+
     subject = 'Weekly Report'
     text = 'email report'
-    bin_array = [0, 150, 160, 205]
-    email_html, src1, src2, src3, src4 = create_report(bin_array=bin_array, user_id=user_id, athlete_id=24403919, start_date='2023-02-20', end_date='2023-02-25') # testing with my parameters
+    email_html, src1, src2, src3, src4 = create_report(bin_array=bin_array, user_id=user_id, athlete_id=athlete_id, start_date='2023-02-20', end_date='2023-02-25') # testing with my parameters
     image_li = [image_path + f'{user_id}_hr1.png', image_path + f'{user_id}_hr2.png', image_path + f'{user_id}_mileage.png', image_path + f'{user_id}_time.png']
     send_email(reciever, subject, text, email_html, image_li)
 
