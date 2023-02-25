@@ -236,7 +236,10 @@ def min_mile_to_string(avg_speed):
         dec_seconds, minutes = math.modf(avg_speed)
         num_sec = dec_seconds * 60
 
-        string = str(int(minutes)) + ":" + str(int(num_sec))
+        if num_sec >= 10: # ensure that paces with single digits are rendered properly; e.g. need to manually add the 0 in 9:06 
+            string = str(int(minutes)) + ":" + str(int(num_sec))
+        else:
+            string = str(int(minutes)) + ":0" + str(int(num_sec))
         return string
     else:
         return avg_speed
