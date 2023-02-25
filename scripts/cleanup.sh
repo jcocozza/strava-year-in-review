@@ -22,7 +22,7 @@ fi
 function cleanFolder(){
   if [ "$(ls -A $1)" ]; then
     do_command "rm -rv $1"
-  else 
+  else
     echo "$1 is empty"
   fi
 }
@@ -33,6 +33,9 @@ cleanFolder "${OPWD}/data/*"
 
 do_log "cleaning charts..."
 cleanFolder "${OPWD}/scripts/static/charts/*"
+
+do_log "cleaning images..."
+cleanFolder "${OPWD}/scripts/static/images/*"
 
 do_log "********** Cleaning Done **********"
 

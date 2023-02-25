@@ -1,15 +1,15 @@
 ########## IMPORTS ##########
 # region - imports
-from plotly.offline import plot
 import weekly_report_functions
 import single_activity_analysis
 import get_user_activity_data
-import sys
 from datetime import datetime
+import os
 
 # endregion - imports
 ########## END IMPORTS ##########
-
+########## Setting working directory ##########
+image_path = os.getcwd() + '/strava-year-in-review/scripts/static/images/'
 
 ########## PARAMETERS ##########
 # region - params
@@ -25,7 +25,7 @@ from datetime import datetime
 
 def create_report(bin_array, user_id, athlete_id, start_date, end_date):
     # Labels for the bins
-    labels = single_activity_analysis.zones(bin_array)  
+    labels = single_activity_analysis.zones(bin_array)
     ########## SET UP INFORMATION ##########
     # region - set up
     starting_datetime = datetime.strptime(
@@ -37,13 +37,16 @@ def create_report(bin_array, user_id, athlete_id, start_date, end_date):
     week_tuple = (start_date, end_date)
     header = f'Summary for {start_date} to {end_date}'
 
+    # Refresh Activity Data
+    get_user_activity_data.refresh_activity_data(user_id)
 
     # Get activity data for the time interval
-    # Need to refresh activity data too
     interval_activity_data = weekly_report_functions.get_week_activity_data(
         week_tuple, athlete_id)
+
+    # Ensure that lap/hr data is upto date in mysql-db
     get_user_activity_data.api_to_mysql_heartrate_lap_data(
-        interval_activity_data, user_id)  # ensure that lap/hr data is upto date in mysql-db
+        interval_activity_data, user_id)
 
     # Get Lap/HR data for the time interval
     interval_heartrate_data = weekly_report_functions.get_week_heartrate_data(
@@ -84,27 +87,10 @@ def create_report(bin_array, user_id, athlete_id, start_date, end_date):
     # where fig is the plot to embed
 
     # Generate your plotly figure as fig
-    src1 = plot(
-        hr_plots[0],
-        output_type='div',
-        include_plotlyjs=True
-    )
-    src2 = plot(
-        hr_plots[1],
-        output_type='div',
-        include_plotlyjs=True
-    )
-    src3 = plot(
-        mileage,
-        output_type='div',
-        include_plotlyjs=True
-    )
-    src4 = plot(
-        time,
-        output_type='div',
-        include_plotlyjs=True
-    )
-
+    src1 = hr_plots[0].write_image(image_path + f"{user_id}_hr1.png")
+    src2 = hr_plots[1].write_image(image_path + f"{user_id}_hr2.png")
+    src3 = mileage.write_image(image_path + f"{user_id}_mileage.png")
+    src4 = time.write_image(image_path + f"{user_id}_time.png")
 
     # endregion - plots
     ########## END PLOTS ##########
@@ -121,11 +107,12 @@ def create_report(bin_array, user_id, athlete_id, start_date, end_date):
     </head>
     <body>
         <!-- Report content -->
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
         <h1> { header } </h1>
 
         <h2> Overview: </h2>
         <!-- total_mileage, avg_mileage, tot_time, avg_time -->
-            <table>
+            <table border="1">
                 <tr>
                 <th>Total Mileage (miles)</th>
                 <th>Average Mileage (miles)</th>
@@ -146,17 +133,18 @@ def create_report(bin_array, user_id, athlete_id, start_date, end_date):
         <p> { act_table } </p>
 
         <h2> Week Summary Graphs</h2>
-        
-        { src1 }
-        { src2 }
-        { src3 }
-        { src4 }
+
+        <br><img src="cid:image1"><br>
+        <br><img src="cid:image2"><br>
+        <br><img src="cid:image3"><br>
+        <br><img src="cid:image4"><br>
+
         <!-- End Report content -->
     </body>
     </html>"""
     #endregion - html
     ########## HTML ##########
-    return email_html
+    return email_html, src1, src2, src3, src4
 
 
 

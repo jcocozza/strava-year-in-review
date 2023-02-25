@@ -258,8 +258,8 @@ def api_to_mysql_heartrate_lap_data(activity_data, user_id):
     return None
 
 # pulls the latest Strava activity and saves to MySQL
-def refresh_activity_data(user_id):
-    refresh_token = sql_functions.get_refresh_token()
+def refresh_activity_data(user_id=None):
+    refresh_token = sql_functions.get_refresh_token(user_id)
     access_token = returning_user_access_token(refresh_token) # getting access token
     data = get_user_activity_data(access_token, user_id, pages_to_pull=1)
     return None

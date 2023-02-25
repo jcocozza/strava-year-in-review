@@ -17,7 +17,7 @@ log_path = cwd + "/logs/api_log.txt" # where to write log to
 ########## THROTTLE ##########
 #region - Throttle
 # This handles GET calls to the Strava API to get data
-# Uses the wrapper to limit calls 
+# Uses the wrapper to limit calls
 
 FIFTEEN_MINUTES = 900
 auth_url = "https://www.strava.com/oauth/token"
@@ -41,7 +41,7 @@ def call_api(url, access_token, parameter=None):
                 log.write(f'Parameters passed: {parameter}\n')
             log.write(f'Response status code: {response.status_code}\n')
             log.write('########## END LOG ##########\n')
-        
+
         return response
 #endregion - Throttle
 ########## END THROTTLE ##########

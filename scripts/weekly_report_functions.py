@@ -244,7 +244,7 @@ def min_mile_to_string(avg_speed):
 def activity_table(activity_data):
     #tbl = activity_data[['name', 'distance', 'moving_time', 'total_elevation_gain', 'type', 'average_speed', 'average_heartrate']]
 
-    html =  """<table>
+    html =  """<table border="1">
                 <tr>
                     <th>name</th>
                     <th>date (day/time)</th>
