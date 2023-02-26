@@ -90,7 +90,7 @@ def create_report(bin_array, user_id, athlete_id, start_date, end_date):
     src1 = hr_plots[0].write_html(image_path + f"{user_id}_hr1.html")
     src2 = hr_plots[1].write_html(image_path + f"{user_id}_hr2.html")
     src3 = mileage.write_html(image_path + f"{user_id}_mileage.html")
-    src4 = time.write_iwrite_htmlmage(image_path + f"{user_id}_time.html")
+    src4 = time.write_html(image_path + f"{user_id}_time.html")
 
     # endregion - plots
     ########## END PLOTS ##########
