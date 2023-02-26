@@ -215,7 +215,7 @@ def ad_hoc():
             header = f'Summary for {start_date} to {end_date}'
 
             # Get Data, Do Analysis, Generate and Save Plots
-            act_table = weekly_report_functions.run_all(week_tuple, athlete_id, bin_array, labels, user_id, duration=delta.days)
+            act_table = weekly_report_functions.run_all(week_tuple, athlete_id, bin_array, labels, user_id, duration=(delta.days + 1))
 
             src1 = url_for('static', filename=f'charts/{user_id}_weekly_hr_pie.html')
             src2 = url_for('static', filename=f'charts/{user_id}_weekly_hr_hist.html')

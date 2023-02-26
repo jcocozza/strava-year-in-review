@@ -33,7 +33,7 @@ def create_report(bin_array, user_id, athlete_id, start_date, end_date):
     ending_datetime = datetime.strptime(
         end_date, "%Y-%m-%d")  # convert date string to datetime
     delta = ending_datetime - starting_datetime  # time delta between start and end
-    duration = delta.days  # The interval we are doing analysis over
+    duration = delta.days + 1  # The interval we are doing analysis over
     week_tuple = (start_date, end_date)
     header = f'Summary for {start_date} to {end_date}'
 
