@@ -7,6 +7,7 @@ from report import create_report
 import sys
 import os
 import sql_functions
+import pendulum
 ########## Setting working directory ##########
 image_path = os.getcwd() + '/strava-year-in-review/scripts/static/images/'
 
@@ -54,8 +55,8 @@ def send_email(receiver, subject, text_ver, html_ver, image_list):
     server.quit()
 
 
-def main():
-    user_id = sys.argv[1]
+def generate_and_send(user_id, start_date, end_date):
+    #user_id = user_id
     package = sql_functions.get_user_package(user_id)
     reciever = package['email']
     bin_array = package['bin_array']
@@ -63,12 +64,27 @@ def main():
 
     subject = 'Weekly Report'
     text = 'email report'
-    email_html, src1, src2, src3, src4 = create_report(bin_array=bin_array, user_id=user_id, athlete_id=athlete_id, start_date='2023-02-20', end_date='2023-02-25') # testing with my parameters
+    email_html, src1, src2, src3, src4 = create_report(bin_array=bin_array, user_id=user_id, athlete_id=athlete_id, start_date=start_date, end_date=end_date) # testing with my parameters
     image_li = [image_path + f'{user_id}_hr1.png', image_path + f'{user_id}_hr2.png', image_path + f'{user_id}_mileage.png', image_path + f'{user_id}_time.png']
     send_email(reciever, subject, text, email_html, image_li)
 
+def email_all():
+    ##### WEEK INFORMATION #####
+    today = pendulum.now()
+    beginning = today.start_of('week')
+    ending = today.end_of('week')
+
+    week_start = beginning.strftime("%Y-%m-%d")
+    week_end = ending.strftime("%Y-%m-%d")
+
+    sql = 'SELECT user_id FROM users WHERE email IS NOT NULL;'
+    user_id_list = sql_functions.local_sql_to_df(sql)['user_id']
+
+    for user_id in user_id_list:
+        generate_and_send(user_id, week_start, week_end)
+
 
 if __name__ == '__main__':
-    main()
+    email_all()
 
 
