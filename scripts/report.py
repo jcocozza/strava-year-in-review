@@ -87,10 +87,10 @@ def create_report(bin_array, user_id, athlete_id, start_date, end_date):
     # where fig is the plot to embed
 
     # Generate your plotly figure as fig
-    src1 = hr_plots[0].write_image(image_path + f"{user_id}_hr1.png")
-    src2 = hr_plots[1].write_image(image_path + f"{user_id}_hr2.png")
-    src3 = mileage.write_image(image_path + f"{user_id}_mileage.png")
-    src4 = time.write_image(image_path + f"{user_id}_time.png")
+    src1 = hr_plots[0].write_html(image_path + f"{user_id}_hr1.html")
+    src2 = hr_plots[1].write_html(image_path + f"{user_id}_hr2.html")
+    src3 = mileage.write_html(image_path + f"{user_id}_mileage.html")
+    src4 = time.write_iwrite_htmlmage(image_path + f"{user_id}_time.html")
 
     # endregion - plots
     ########## END PLOTS ##########

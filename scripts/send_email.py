@@ -65,7 +65,7 @@ def generate_and_send(user_id, start_date, end_date):
     subject = 'Weekly Report'
     text = 'email report'
     email_html, src1, src2, src3, src4 = create_report(bin_array=bin_array, user_id=user_id, athlete_id=athlete_id, start_date=start_date, end_date=end_date) # testing with my parameters
-    image_li = [image_path + f'{user_id}_hr1.png', image_path + f'{user_id}_hr2.png', image_path + f'{user_id}_mileage.png', image_path + f'{user_id}_time.png']
+    image_li = [image_path + f'{user_id}_hr1.html', image_path + f'{user_id}_hr2.html', image_path + f'{user_id}_mileage.html', image_path + f'{user_id}_time.html']
     send_email(reciever, subject, text, email_html, image_li)
 
 def email_all():
@@ -77,7 +77,8 @@ def email_all():
     week_start = beginning.strftime("%Y-%m-%d")
     week_end = ending.strftime("%Y-%m-%d")
 
-    sql = 'SELECT user_id FROM users WHERE email IS NOT NULL;'
+    #sql = 'SELECT user_id FROM users WHERE email IS NOT NULL;'
+    sql = 'SELECT user_id FROM users WHERE user_id = 12;' # temp for testing 
     user_id_list = sql_functions.local_sql_to_df(sql)['user_id']
 
     for user_id in user_id_list:
